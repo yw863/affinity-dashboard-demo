@@ -20,13 +20,21 @@
   --paper:#F5F3F7;
   --surface:#FCFBFD;
   --edge:#E6E3EB;
-  --ink:#2F293D;
+  --ink:#2A2537;
   --ink-2:#6B5E82;
   --hair:#DCD9E0;
   --p1:#625492;
   --p2:#61869E;
   --p3:#A66E79;
   --tint:rgba(42,38,52,.04);
+
+  /* Transient overlays — smoked-vellum glass. An INK tint, not a white one:
+     the plate reads a shade darker than the paper, so it still holds an edge
+     over blank ground where a white translucency would vanish. brightness()
+     washes the chart out underneath and keeps the 12px labels clean. */
+  --glass:rgba(47,41,61,.06);
+  --glass-blur:12px;
+  --glass-drop:0 6px 20px rgba(47,41,61,.08);
 
   --serif:'Libre Bodoni', Georgia, 'Times New Roman', serif;
   --sans:'Red Hat Text', 'Segoe UI', system-ui, sans-serif;
@@ -277,9 +285,11 @@ html { caret-color:var(--p1); scrollbar-color:var(--hair) transparent; scrollbar
 .tile-tip {
   position:absolute; top:calc(100% + 14px); z-index:6;
   max-width:340px; padding:var(--s3) var(--s4);
-  background:var(--surface); border:1px solid var(--edge); border-radius:4px;
+  background:var(--glass); border-radius:4px; box-shadow:var(--glass-drop);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.2) brightness(1.07);
+  backdrop-filter:blur(var(--glass-blur)) saturate(1.2) brightness(1.07);
   font-size:15px; font-weight:300; line-height:1.45; color:var(--ink-2); letter-spacing:.012em;
-  opacity:0; visibility:hidden; transition:opacity var(--d-fast) var(--ease), visibility 0s linear var(--d-fast);
+  opacity:0; visibility:hidden; transition:opacity .16s var(--ease), visibility 0s linear .16s;
 }
 .tile-tip.on { opacity:1; visibility:visible; transition-delay:0s; }
 
@@ -328,10 +338,12 @@ html { caret-color:var(--p1); scrollbar-color:var(--hair) transparent; scrollbar
 .tip {
   position:absolute; z-index:7; pointer-events:none; min-width:186px;
   padding:var(--s3) var(--s4) var(--s3);
-  background:var(--surface); border:1px solid var(--edge); border-radius:4px;
-  opacity:0; transition:opacity .12s var(--ease);
+  background:var(--glass); border-radius:4px; box-shadow:var(--glass-drop);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.2) brightness(1.07);
+  backdrop-filter:blur(var(--glass-blur)) saturate(1.2) brightness(1.07);
+  opacity:0; visibility:hidden; transition:opacity .16s var(--ease), visibility 0s linear .16s;
 }
-.tip.on { opacity:1; }
+.tip.on { opacity:1; visibility:visible; transition-delay:0s; }
 .tip-name { font-family:var(--serif); font-weight:400; font-size:19px; font-variant-numeric:normal; }
 .tip-time { font-size:13px; font-weight:300; color:var(--ink-2); margin-left:var(--s2); }
 .tip-attr { font-size:12px; letter-spacing:.1em; color:var(--ink-2); margin:var(--s2) 0 var(--s3); }
@@ -550,13 +562,7 @@ html { caret-color:var(--p1); scrollbar-color:var(--hair) transparent; scrollbar
   }
   var EASE = bez(.32, .72, 0, 1);      /* matches --ease; the one curve on the page */
   var OUT = bez(.22, 1, .36, 1);       /* count-up only: lands softer than it starts */
-  /* The opening wipe is the one thing on the page that is not an arrival, so it
-     is the one thing that does not get the arrival curve. EASE spends 85% of
-     its travel in the first 30% of its time — correct for an object coming to
-     rest, wrong for a line being drawn, which just looked like the chart
-     appearing. This curve moves steadily through the middle and lands. */
-  var DRAW = bez(.4, .3, .25, 1);
-  var D_FLOW = 600, D_SWAP = 500, D_FAST = 150, D_DRAW = 1000;
+  var D_FLOW = 600, D_SWAP = 500, D_FAST = 150, D_DRAW = 900;
 
   var tweens = [], rafId = null, ready = false;
   function tween(key, dur, ease, step, done, delay) {
@@ -1535,7 +1541,7 @@ html { caret-color:var(--p1); scrollbar-color:var(--hair) transparent; scrollbar
        would march its dashes instead of drawing it — and one clip carries the
        markers, the value labels and the fill band on the same sweep. */
     wipeRect.setAttribute("width", 0);
-    tween("wipe", D_DRAW, DRAW, function (u) { wipeRect.setAttribute("width", L.W * u); }, null, 150);
+    tween("wipe", D_DRAW, EASE, function (u) { wipeRect.setAttribute("width", L.W * u); }, null, 150);
 
     prows.forEach(function (p, i) {
       p.reveal = 0;

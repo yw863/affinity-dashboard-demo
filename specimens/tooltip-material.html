@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tooltip Material</title>
+<style>
+/* Self-hosted, offline-safe — same files index.html embeds. */
+@font-face{font-family:'Libre Bodoni';font-style:normal;font-weight:400 700;font-display:block;
+  src:url(../fonts/libre-bodoni-latin.woff2) format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2212}
+@font-face{font-family:'Red Hat Text';font-style:normal;font-weight:300 500;font-display:block;
+  src:url(../fonts/red-hat-text-latin.woff2) format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2212}
+
+:root {
+  --paper:#F5F3F7; --surface:#FCFBFD; --edge:#E6E3EB;
+  --ink:#2F293D; --ink-2:#6B5E82; --hair:#DCD9E0;
+  --p1:#625492; --p2:#61869E; --p3:#A66E79;
+  --tint:rgba(42,38,52,.04);
+  --serif:'Libre Bodoni', Georgia, serif;
+  --sans:'Red Hat Text', 'Segoe UI', system-ui, sans-serif;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
+  --ease:cubic-bezier(.32,.72,0,1);
+  /* Driven by the sliders. */
+  --g-blur:12px; --g-alpha:.72; --g-sat:1.3; --g-ink:.06;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans);
+       font-variant-numeric:lining-nums tabular-nums; }
+main { max-width:1680px; margin:0 auto; padding:56px 56px 120px; }
+
+h1 { font-family:var(--serif); font-weight:400; font-size:44px; margin:0 0 10px; letter-spacing:-.01em; }
+.intro { color:var(--ink-2); font-size:15px; font-weight:300; line-height:1.6; max-width:78ch; margin:0; }
+.intro b { font-weight:500; color:var(--ink); }
+
+/* ── Controls: tune blur/alpha live, then read the numbers off ───────────── */
+.controls { position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:var(--s5);
+  margin:36px 0 0; padding:14px 0; background:var(--paper); border-bottom:1px solid var(--hair); }
+.ctl { display:flex; align-items:center; gap:var(--s3); font-size:12px; letter-spacing:.09em; color:var(--ink-2); }
+.ctl input { width:150px; accent-color:var(--p1); }
+.ctl-of { font-size:10px; letter-spacing:.1em; color:var(--ink-2); border:1px solid var(--edge); border-radius:999px; padding:2px 6px; }
+.ctl output { font-size:14px; letter-spacing:0; color:var(--ink); min-width:56px; }
+.ctl-note { margin-left:auto; font-size:13px; font-weight:300; color:var(--ink-2); font-style:italic; }
+
+/* ── Variant block ───────────────────────────────────────────────────────── */
+.variant { padding:52px 0 0; }
+.variant + .variant { border-top:1px solid var(--hair); margin-top:52px; }
+.vhead { display:flex; align-items:baseline; gap:var(--s4); margin-bottom:var(--s2); }
+.vletter { font-family:var(--serif); font-size:40px; line-height:1; color:var(--ink); }
+.vname { font-family:var(--serif); font-size:28px; font-weight:400; }
+.vtag { font-size:11px; letter-spacing:.14em; color:var(--ink-2); border:1px solid var(--edge);
+        border-radius:999px; padding:3px 10px; }
+.vwhy { font-size:14.5px; font-weight:300; line-height:1.55; color:var(--ink-2); max-width:86ch; margin:0 0 var(--s5); }
+.vwhy b { font-weight:500; color:var(--ink); }
+.vcss { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; line-height:1.7;
+  color:var(--ink-2); background:var(--tint); border-radius:4px; padding:10px 14px; margin:0 0 var(--s5);
+  white-space:pre-wrap; }
+
+.beds { display:grid; grid-template-columns:1.55fr 1fr; gap:var(--s5); }
+.bed { position:relative; border-radius:4px; overflow:hidden; }
+.bed-l { position:absolute; left:12px; top:10px; z-index:9; font-size:11px; letter-spacing:.13em;
+         color:var(--ink-2); }
+.bed-chart { background:var(--surface); }
+.bed-chart svg { display:block; width:100%; height:auto; }
+.bed-paper { background:var(--paper); min-height:330px; padding:34px 30px; }
+
+/* Stat-tile context for the paper bed — the real .tile-tip situation. */
+.tiles { display:grid; grid-template-columns:repeat(2,1fr); border-bottom:1px solid var(--hair);
+         padding-bottom:var(--s4); }
+.tile { padding:0 var(--s5); border-left:1px solid var(--hair); }
+.tile:first-child { border-left:0; padding-left:0; }
+.tile-v { font-family:var(--serif); font-size:46px; line-height:1; }
+.tile-k { font-size:11px; letter-spacing:.13em; color:var(--ink-2); margin-top:10px; }
+
+/* ── Tooltips: base styles lifted verbatim from index.html ───────────────── */
+.tip, .tile-tip {
+  position:absolute; z-index:7; pointer-events:none;
+  border-radius:4px;
+}
+.tip { min-width:186px; padding:var(--s3) var(--s4) var(--s3); }
+.tile-tip { max-width:340px; padding:var(--s3) var(--s4);
+  font-size:15px; font-weight:300; line-height:1.45; color:var(--ink-2); letter-spacing:.012em; }
+.tip-name { font-family:var(--serif); font-weight:400; font-size:19px; font-variant-numeric:normal; }
+.tip-time { font-size:13px; font-weight:300; color:var(--ink-2); margin-left:var(--s2); }
+.tip-attr { font-size:12px; letter-spacing:.1em; color:var(--ink-2); margin:var(--s2) 0 var(--s3); }
+.tip-grid { display:grid; grid-template-columns:auto 1fr; gap:3px var(--s5); font-size:15px; font-weight:300; }
+.tip-grid b { font-weight:300; color:var(--ink-2); }
+.tip-grid span { text-align:right; color:var(--ink); }
+.tip-match { font-family:var(--serif); font-size:16px; margin-top:var(--s3); font-variant-numeric:normal; }
+.tip-comps { margin-top:var(--s3); padding-top:var(--s3); border-top:1px solid var(--hair);
+             display:flex; flex-direction:column; gap:5px; }
+.tip-comp { display:flex; align-items:center; gap:var(--s2); font-size:13.5px; font-weight:300; color:var(--ink-2); }
+.tip-comp i { width:6px; height:6px; border-radius:50%; flex:none; }
+.tip-comp em { font-style:normal; flex:1; white-space:nowrap; }
+
+/* ── The five materials ──────────────────────────────────────────────────── */
+
+/* A — current: opaque paper plate, hairline does all the edge work. */
+.v-a { background:var(--surface); border:1px solid var(--edge); }
+
+/* B — pure frosted glass: white translucency, no edge but a soft drop. */
+.v-b {
+  border:0; background:rgba(252,251,253,var(--g-alpha));
+  -webkit-backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat));
+  backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat));
+  box-shadow:0 8px 24px rgba(47,41,61,.10);
+}
+
+/* C — smoked vellum: an INK tint, not a white one, so the plate reads
+   slightly darker than the paper and survives an empty backdrop. */
+.v-c {
+  border:0; background:rgba(47,41,61,var(--g-ink));
+  -webkit-backdrop-filter:blur(var(--g-blur)) saturate(1.2) brightness(1.07);
+  backdrop-filter:blur(var(--g-blur)) saturate(1.2) brightness(1.07);
+  box-shadow:0 6px 20px rgba(47,41,61,.08);
+}
+
+/* D — glass with a light edge: the glass idiom's own border, a specular
+   highlight along the top rather than a printed hairline. */
+.v-d {
+  border:0; background:rgba(252,251,253,var(--g-alpha));
+  -webkit-backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat));
+  backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),
+             inset 0 0 0 1px rgba(255,255,255,.5),
+             0 10px 26px rgba(47,41,61,.11);
+}
+
+/* E — paper, edge removed: no glass at all. Opacity kept, hairline traded
+   for a shadow. The minimum change that answers "lose the border". */
+.v-e {
+  border:0; background:var(--surface);
+  box-shadow:0 10px 28px rgba(47,41,61,.12), 0 1px 2px rgba(47,41,61,.055);
+}
+
+footer { margin-top:80px; padding-top:var(--s5); border-top:1px solid var(--hair);
+  font-family:var(--serif); font-size:20px; font-weight:400; color:var(--ink); }
+footer span { display:block; font-family:var(--sans); font-size:13.5px; font-weight:300;
+  color:var(--ink-2); margin-top:8px; line-height:1.6; max-width:80ch; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Tooltip Material</h1>
+  <p class="intro">Five materials under the same tooltip, each shown twice: over a <b>dense patch of chart</b>
+    (where blur has something to work with) and over <b>empty paper</b> below a stat tile (where it does not).
+    The second bed is the one that decides it — a translucent light layer on <b>#F5F3F7</b> has almost no
+    luminance to trade on, so whatever replaces the hairline has to hold the edge there.</p>
+
+  <div class="controls">
+    <label class="ctl">BLUR <input id="blur" type="range" min="0" max="28" step="1" value="12">
+      <output id="blur-o">12px</output></label>
+    <label class="ctl">ALPHA <span class="ctl-of">B·D</span>
+      <input id="alpha" type="range" min="40" max="100" step="2" value="72">
+      <output id="alpha-o">0.72</output></label>
+    <label class="ctl">INK <span class="ctl-of">C</span>
+      <input id="ink" type="range" min="2" max="16" step="1" value="6">
+      <output id="ink-o">0.06</output></label>
+    <label class="ctl">SATURATE <input id="sat" type="range" min="100" max="200" step="5" value="130">
+      <output id="sat-o">1.30</output></label>
+    <span class="ctl-note">Watch the 12px labels, not the plate.</span>
+  </div>
+
+  <div id="variants"></div>
+
+  <footer>
+    Pick the bed, not the plate.
+    <span>A material only exists in relation to what is behind it. Judge each row by the right-hand
+      bed — if the tooltip stops being a tooltip over blank paper, the material is wrong no matter how
+      well it reads over the lines.</span>
+  </footer>
+</main>
+
+<script>
+/* ── Backdrop: a faithful-enough patch of the real chart ──────────────────── */
+var HUES = ["#625492", "#61869E", "#A66E79"];
+var SERIES = [
+  { hue:HUES[0], label:"T0", ai:[4.1,1.3,1.1,1.2,0.9,1.4,2.2,2.6], pn:[4.3,1.0,1.2,1.3,1.1,1.2,2.0,2.4] },
+  { hue:HUES[1], label:"T3", ai:[6.4,3.1,2.4,3.6,2.8,3.2,4.1,4.6], pn:[6.0,2.8,2.7,3.2,3.1,2.9,4.4,4.2] },
+  { hue:HUES[2], label:"T6", ai:[7.9,5.2,4.4,6.1,5.4,5.6,6.8,7.1], pn:[7.4,4.8,4.9,5.7,5.8,5.1,7.2,6.6] }
+];
+var ATTRS = ["COVERAGE","REFLECTION","UNEVEN","POWDERY","CAKEY","FLAKE","IN LINES","IN PORES"];
+var W = 980, H = 356, PAD = { l:44, r:26, t:54, b:44 };
+function X(i) { return PAD.l + i * ((W - PAD.l - PAD.r) / (ATTRS.length - 1)); }
+function Y(v) { return H - PAD.b - (v / 10) * (H - PAD.t - PAD.b); }
+function path(vals) { return vals.map(function (v, i) { return (i ? "L" : "M") + X(i) + " " + Y(v); }).join(""); }
+
+function chartSVG() {
+  var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">';
+  for (var g = 0; g <= 10; g += 2) {
+    s += '<line x1="' + PAD.l + '" x2="' + (W - PAD.r) + '" y1="' + Y(g) + '" y2="' + Y(g) +
+         '" stroke="#DCD9E0" stroke-width="1"/>' +
+         '<text x="' + (PAD.l - 12) + '" y="' + (Y(g) + 4) + '" text-anchor="end" font-size="11" ' +
+         'fill="#6B5E82" font-family="Red Hat Text" font-weight="300">' + g + '</text>';
+  }
+  ATTRS.forEach(function (a, i) {
+    s += '<text x="' + X(i) + '" y="' + (H - 16) + '" text-anchor="middle" font-size="9.5" ' +
+         'letter-spacing="1.1" fill="#6B5E82" font-family="Red Hat Text" font-weight="300">' + a + '</text>';
+  });
+  SERIES.forEach(function (w) {
+    s += '<path d="' + path(w.pn) + '" fill="none" stroke="' + w.hue +
+         '" stroke-width="1.5" stroke-dasharray="4 3" opacity=".8"/>';
+    s += '<path d="' + path(w.ai) + '" fill="none" stroke="' + w.hue + '" stroke-width="2"/>';
+    w.ai.forEach(function (v, i) {
+      s += '<circle cx="' + X(i) + '" cy="' + Y(v) + '" r="3" fill="' + w.hue + '"/>';
+      s += '<text x="' + X(i) + '" y="' + (Y(v) - 10) + '" text-anchor="middle" font-size="11" ' +
+           'fill="#2F293D" font-family="Red Hat Text" font-weight="300">' + v.toFixed(1) + '</text>';
+    });
+    w.pn.forEach(function (v, i) {
+      s += '<circle cx="' + X(i) + '" cy="' + Y(v) + '" r="2.5" fill="none" stroke="' + w.hue + '" stroke-width="1.3"/>';
+    });
+  });
+  return s + '</svg>';
+}
+
+/* ── Tooltip contents: the busiest real state (§ comparators + match) ─────── */
+function tipHTML(v) {
+  return '<div class="tip ' + v + '" style="left:30.5%; top:22%;">' +
+    '<div><span class="tip-name">LANCOME TIU</span><span class="tip-time">T6</span></div>' +
+    '<div class="tip-attr">POWDERY</div>' +
+    '<div class="tip-grid"><b>AI</b><span>6.1</span><b>Panel</b><span>5.7</span>' +
+    '<b>Diff</b><span>+0.4</span></div>' +
+    '<div class="tip-match">Match.</div>' +
+    '<div class="tip-comps">' +
+    '<div class="tip-comp"><i style="background:' + HUES[1] + '"></i><em>T3</em>3.6 / 3.2</div>' +
+    '<div class="tip-comp"><i style="background:' + HUES[0] + '"></i><em>T0</em>1.2 / 1.3</div>' +
+    '</div></div>';
+}
+function tileTipHTML(v) {
+  return '<div class="tile-tip ' + v + '" style="left:30px; top:168px;">' +
+    'Agreement counts a pair as matched when AI and panel land within 0.5 of each other, ' +
+    'across all eight attributes at the selected times.</div>';
+}
+
+var VARIANTS = [
+  { k:"v-a", letter:"A", name:"Paper plate", tag:"CURRENT",
+    why:"The control. <b>Opaque surface + 1px hairline</b> — the edge is printed, not lit, and it is the only thing separating the plate from the paper. Consistent with every other floating surface on the page (.options, .seg-thumb, .panel), which is both its strength and the reason it feels unremarkable.",
+    css:"background:var(--surface);\nborder:1px solid var(--edge);" },
+  { k:"v-b", letter:"B", name:"Frosted glass", tag:"WHAT YOU ASKED FOR",
+    why:"A white translucency over blur, hairline gone, a soft drop doing the separation. Reads as glass over the chart. Over empty paper it is <b>white on almost-white</b> — the shadow is carrying the whole plate, and if you lower the shadow the card dissolves. Also the most recognisably 2024 of the five.",
+    css:"border:0;\nbackground:rgba(252,251,253,.72);\nbackdrop-filter:blur(12px) saturate(1.3);\nbox-shadow:0 8px 24px rgba(47,41,61,.10);" },
+  { k:"v-c", letter:"C", name:"Smoked vellum", tag:"INK TINT",
+    why:"Same construction as B with the tint <b>inverted</b>: a 6% ink layer instead of a white one, so the plate sits <b>slightly darker</b> than the paper and holds its edge over a blank backdrop without leaning on the shadow. <b>brightness(1.07)</b> washes the chart lines out underneath so the 12px labels stay clean. Still glass, but ink-derived rather than iOS-derived.",
+    css:"border:0;\nbackground:rgba(47,41,61,.06);   /* ← --g-ink */\nbackdrop-filter:blur(12px) saturate(1.2) brightness(1.07);\nbox-shadow:0 6px 20px rgba(47,41,61,.08);" },
+  { k:"v-d", letter:"D", name:"Lit-edge glass", tag:"SPECULAR",
+    why:"B plus glass's own border: an inset white highlight along the top and a fainter one around the rest — an edge that is <b>lit rather than drawn</b>. Best-defined of the three glass options over paper. The risk is the opposite of B's: two inset highlights plus a drop is a lot of decoration for a 186px card.",
+    css:"border:0;\nbackground:rgba(252,251,253,.72);\nbackdrop-filter:blur(12px) saturate(1.3);\nbox-shadow:inset 0 1px 0 rgba(255,255,255,.9),\n           inset 0 0 0 1px rgba(255,255,255,.5),\n           0 10px 26px rgba(47,41,61,.11);" },
+  { k:"v-e", letter:"E", name:"Edge removed", tag:"NO GLASS",
+    why:"No blur, no translucency. <b>Opaque paper, hairline traded for a shadow</b> — the minimum change that answers the actual complaint. Keeps small text at full contrast, costs nothing on the ThinkPad's GPU, and stays inside the page's existing print vocabulary. Include it because it may be what you wanted before glass got named.",
+    css:"border:0;\nbackground:var(--surface);\nbox-shadow:0 10px 28px rgba(47,41,61,.12),\n           0 1px 2px rgba(47,41,61,.055);" }
+];
+
+document.getElementById("variants").innerHTML = VARIANTS.map(function (v) {
+  return '<section class="variant">' +
+    '<div class="vhead"><span class="vletter">' + v.letter + '</span>' +
+    '<span class="vname">' + v.name + '</span><span class="vtag">' + v.tag + '</span></div>' +
+    '<p class="vwhy">' + v.why + '</p>' +
+    '<div class="vcss">' + v.css + '</div>' +
+    '<div class="beds">' +
+      '<div class="bed bed-chart"><span class="bed-l">OVER THE CHART</span>' + chartSVG() + tipHTML(v.k) + '</div>' +
+      '<div class="bed bed-paper"><span class="bed-l">OVER EMPTY PAPER</span>' +
+        '<div class="tiles">' +
+          '<div class="tile"><div class="tile-v">62<span style="font-size:24px">%</span></div>' +
+            '<div class="tile-k">AGREEMENT</div></div>' +
+          '<div class="tile"><div class="tile-v">0.4</div><div class="tile-k">MEAN DRIFT</div></div>' +
+        '</div>' + tileTipHTML(v.k) +
+      '</div>' +
+    '</div></section>';
+}).join("");
+
+/* ── Live tuning ──────────────────────────────────────────────────────────── */
+function bind(id, out, fmt, set) {
+  var el = document.getElementById(id), o = document.getElementById(out);
+  function run() { var n = +el.value; o.textContent = fmt(n); document.documentElement.style.setProperty(set, String(fmt(n))); }
+  el.addEventListener("input", run); run();
+}
+bind("blur", "blur-o", function (n) { return n + "px"; }, "--g-blur");
+bind("alpha", "alpha-o", function (n) { return (n / 100).toFixed(2); }, "--g-alpha");
+bind("ink", "ink-o", function (n) { return (n / 100).toFixed(2); }, "--g-ink");
+bind("sat", "sat-o", function (n) { return (n / 100).toFixed(2); }, "--g-sat");
+</script>
+</body>
+</html>

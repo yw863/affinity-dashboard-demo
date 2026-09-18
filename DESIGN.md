@@ -84,8 +84,9 @@ Never use color to mark "ours" vs "market" — see §6.1.
 
 1. **Segmented time control thumb.** A solid surface-colored capsule with a 1px edge, sitting in a recessed track (track = ink at ~4%, no inner shadow on the thumb). Flat and modern, not glossy: no inner shadow, no top highlight, no gradient. The affordance comes from the thumb reading as a physical object in a track, plus `cursor: grab` / `grabbing`, and a slight scale-down (~0.98) while dragging.
 2. **Product image in the right panel** (§8.1): a very light drop shadow, so it sits on the page like an object.
+3. **Transient overlays — smoked vellum.** The two tooltips (chart `.tip`, stat tile `.tile-tip`) are the only glass on the page: a 6% **ink** tint over `blur(12px) saturate(1.2) brightness(1.07)`, no border, plus a soft drop (`0 6px 20px` ink @ 8%). The tint is ink rather than white on purpose — a white translucency on `#F5F3F7` has no luminance to trade on and the plate disappears over blank paper, so the plate reads a shade **darker** than the paper and keeps its edge everywhere; `brightness()` washes the chart out underneath so 12px labels stay clean. Tokens: `--glass`, `--glass-blur`, `--glass-drop`. This applies **only to overlays that follow the pointer and leave** — standing surfaces (right panel, dropdown, thumb, legend key) stay opaque paper with a 1px edge, which is what keeps the glass legible as "this is temporary."
 
-Everything else is flat: no card shadows, no glassmorphism, no gradients as decoration, no glow. Hierarchy is carried by hairlines, surface color and whitespace.
+Everything else is flat: no card shadows, no gradients as decoration, no glow. Hierarchy is carried by hairlines, surface color and whitespace.
 
 ---
 
@@ -173,7 +174,7 @@ Labels are sentence case (see §3.2), not uppercase.
 Behavior:
 - **Count-up** animation on page load (numbers roll from 0 to target, ~1.2 s, ease-out). Runs once. Kept deliberately: stakeholders read it as polish. Revisit if it starts to feel gimmicky in review.
 - **Pinned.** Tiles never change with selection. They represent the whole project; the chart represents the evidence.
-- **Hover:** no 3D tilt, no perspective transform. The tooltip / computation note fades in below the tile (~150 ms), and the tile's hairline separator darkens to ink. Nothing moves.
+- **Hover:** no 3D tilt, no perspective transform. The tooltip / computation note fades in below the tile (~150 ms) on smoked-vellum glass (§3.3), and the tile's hairline separator darkens to ink. Nothing moves.
 
 ---
 
