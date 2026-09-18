@@ -1,0 +1,36 @@
+{
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-09-17T19:21:04.492Z",
+        "reason": "false positive on .tile: 40px side padding wherever border-left exists; only :first-child has padding-left:0 and it has border-left:0"
+      },
+      {
+        "rule": "clipped-overflow-container",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-09-17T19:44:41.608Z",
+        "reason": "sanctioned: the demo is a fixed 1920x1050 canvas scaled to fit, so html/body/#stage-wrap must clip; the only positioned layer is the formula menu, which sits in the left column at y~370 with max-height 360 and cannot reach a clip edge (verified in render)"
+      },
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-09-18T00:27:30.597Z",
+        "reason": "sanctioned: .seg-thumb only. The time thumb must both travel and stretch across contiguous selected segments (DESIGN 6.2); transform translateX+scaleX would distort its 1px edge and 999px radius. It is one absolutely positioned element in a 288px track on a fixed, non-scrolling 1920x1050 stage. Measured live with 3 series: flow+thumb transition median 16.7ms / p90 17.3 / max 18.8; live thumb drag median 16.7 / p90 17.6 / max 18.3 - no dropped frames."
+      }
+    ]
+  }
+}

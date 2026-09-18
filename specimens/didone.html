@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Didone Specimens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..900&family=Libre+Bodoni:wght@400..700&family=Noto+Serif+Display:wdth,wght@62.5..100,100..900&family=Prata&family=Old+Standard+TT:wght@400;700&family=Gloock&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#F5F3F7; --ink:#2A2634; --ink2:#6E6878; --hair:#DCD9E0; --lav:#7B6EA6; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family: -apple-system, sans-serif; }
+  main { padding:40px; display:grid; gap:0; }
+  .row { display:grid; grid-template-columns: 260px 1fr 180px 240px; align-items:baseline; gap:32px; padding:28px 0; border-bottom:1px solid var(--hair); }
+  .meta { font-size:12px; color:var(--ink2); line-height:1.5; }
+  .meta b { color:var(--ink); font-weight:600; font-size:13px; }
+  .title { font-size:52px; line-height:1; }
+  .num { font-size:72px; line-height:1; color:var(--ink); }
+  .name { font-size:24px; color:var(--lav); }
+  .name small { display:block; font-size:16px; color:var(--ink); margin-top:6px; }
+  h1 { font-size:13px; letter-spacing:.12em; color:var(--ink2); font-weight:500; margin:0 0 8px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>DIDONE CANDIDATES · ON PAPER #F5F3F7 · TITLE 52 / NUMBER 72 / NAME 24 + 16</h1>
+  <!-- font-family, font-variation-settings, label -->
+</main>
+<script>
+const fonts = [
+  ["'Bodoni 72', serif", "", "Bodoni 72 (macOS local)", "Reference. Only renders on a Mac; licence needed to embed."],
+  ["'Bodoni Moda'", "'opsz' 96", "Bodoni Moda · opsz 96", "What you saw: display optical size, hairlines very thin."],
+  ["'Bodoni Moda'", "'opsz' 11", "Bodoni Moda · opsz 11", "Same font, small-text optical size: sturdier hairlines, wider."],
+  ["'Libre Bodoni'", "", "Libre Bodoni", "Bodoni cut for text: lower contrast, wider, robust hairlines."],
+  ["'Noto Serif Display'", "'wdth' 100", "Noto Serif Display · wght 300", "Didone-like display with real light weights.", 300],
+  ["'Noto Serif Display'", "'wdth' 100", "Noto Serif Display · wght 400", "", 400],
+  ["'Prata'", "", "Prata", "Soft Didone, generous width, single weight."],
+  ["'Old Standard TT'", "", "Old Standard TT", "19th-c. Modern (Scotch lineage): wider, sturdier, bookish."],
+  ["'Gloock'", "", "Gloock", "High-contrast, compact, punchy; single weight."],
+];
+const main = document.querySelector("main");
+for (const [fam, fvs, label, note, wght] of fonts) {
+  const s = `font-family:${fam}, serif; font-variation-settings:${fvs || "normal"}; font-weight:${wght || 400};`;
+  main.insertAdjacentHTML("beforeend", `
+    <div class="row">
+      <div class="meta"><b>${label}</b><br>${note}</div>
+      <div class="title" style="${s}">Affinity × AI</div>
+      <div class="num" style="${s}">84.7%</div>
+      <div class="name" style="${s}">NARS LightR<small>LANCOME TIU · YSL All Hours</small></div>
+    </div>`);
+}
+</script>
+</body>
+</html>

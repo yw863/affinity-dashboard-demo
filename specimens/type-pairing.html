@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Type Pairing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Bodoni:wght@400..700&family=Cormorant+Garamond:wght@300..500&family=Hanken+Grotesk:wght@300..500&family=Libre+Franklin:wght@300..500&family=Red+Hat+Text:wght@300..500&family=Atkinson+Hyperlegible+Next:wght@300..500&family=Commissioner:wght@300..500&family=Inter:wght@300..500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#F5F3F7; --surface:#FCFBFD; --edge:#E6E3EB; --ink:#2A2634; --ink2:#6E6878;
+    --hair:#DCD9E0; --p1:#7B6EA6; --p2:#61869E; --p3:#A66E79;
+    --serif:'Libre Bodoni'; --sans:'Hanken Grotesk';
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans), sans-serif; }
+  main { max-width:1840px; margin:0 auto; padding:40px 40px 80px; }
+  h1 { font-family:var(--serif), serif; font-weight:400; font-size:40px; margin:0 0 6px; }
+  .intro { color:var(--ink2); font-size:14px; margin:0 0 48px; max-width:900px; line-height:1.55; }
+  h2 { font-size:12px; letter-spacing:.14em; text-transform:uppercase; font-weight:500; color:var(--ink2);
+       margin:64px 0 0; padding-bottom:10px; border-bottom:1px solid var(--ink); }
+  .spec { padding:28px 0 36px; border-bottom:1px solid var(--hair); }
+  .spec-label { display:flex; gap:16px; align-items:baseline; font-size:12px; color:var(--ink2); margin-bottom:22px; }
+  .spec-label b { font-size:14px; color:var(--ink); font-weight:600; }
+  .tag { font-size:11px; letter-spacing:.08em; padding:2px 8px; border:1px solid var(--edge); border-radius:999px; }
+  .tag.ok { color:var(--ink); } .tag.no { color:var(--p3); border-color:var(--p3); }
+
+  /* Stat tile row — DESIGN §5.2: uncarded, vertical hairlines */
+  .tiles { display:grid; grid-template-columns:repeat(3, 1fr); height:108px; }
+  .tile { padding:6px 32px; border-left:1px solid var(--hair); display:flex; flex-direction:column; justify-content:center; }
+  .tile:first-child { border-left:0; padding-left:0; }
+  .tile .v { font-family:var(--f-serif), serif; font-weight:var(--f-serif-w); font-size:64px; line-height:1;
+             font-variant-numeric:lining-nums; }
+  .tile .l { font-family:var(--f-sans), sans-serif; font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+             color:var(--ink2); margin-top:10px; font-weight:400; }
+
+  .names { display:flex; gap:48px; align-items:baseline; margin-top:26px; }
+  .names .main { font-family:var(--f-serif), serif; font-weight:var(--f-serif-w); font-size:40px; }
+  .names .chip { font-family:var(--f-serif), serif; font-weight:var(--f-serif-w); font-size:20px; display:flex; gap:8px; align-items:center; }
+  .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+
+  /* Sans detail: axis labels, attribute list, tooltip */
+  .detail { display:grid; grid-template-columns:1fr 240px 220px; gap:48px; margin-top:28px; align-items:start;
+            font-family:var(--f-sans), sans-serif; }
+  .axis { display:grid; grid-template-columns:repeat(8, 1fr); gap:12px; border-top:1px solid var(--hair); padding-top:12px; }
+  .axis span { font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2); line-height:1.35; }
+  .yaxis { display:flex; gap:28px; font-size:11px; color:var(--ink2); margin-bottom:10px; font-variant-numeric:tabular-nums; }
+  .attrs { font-size:12px; letter-spacing:.1em; text-transform:uppercase; line-height:2.1; }
+  .attrs .sec { font-size:10.5px; color:var(--ink2); letter-spacing:.16em; border-bottom:1px solid var(--hair); margin-bottom:4px; }
+  .tip { background:var(--surface); border:1px solid var(--edge); border-radius:6px; padding:12px 14px;
+         box-shadow:0 1px 2px rgba(42,38,52,.06); font-size:13px; font-variant-numeric:tabular-nums; }
+  .tip .n { font-family:var(--f-serif), serif; font-size:17px; }
+  .tip .t { font-size:11px; color:var(--ink2); margin-left:6px; }
+  .tip .a { font-size:11px; letter-spacing:.1em; color:var(--ink2); margin:6px 0 8px; }
+  .tip .r { display:flex; justify-content:space-between; line-height:1.7; font-weight:400; }
+  .tip .ok { color:var(--ink2); font-size:12px; margin-top:4px; }
+  .digits { margin-top:16px; font-size:13px; color:var(--ink2); font-variant-numeric:tabular-nums; line-height:1.5; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Type Pairing</h1>
+  <p class="intro">
+    Part 1 holds the sans constant (Hanken Grotesk) and compares the display serif on the stat tiles.
+    Part 2 holds the serif constant (Libre Bodoni) and compares the sans on labels, axis text and tooltip numbers.
+    Every face here is OFL on Google Fonts, so it can be self-hosted and renders the same on Windows.
+    The tnum tag is measured live in this browser: it checks that all digits have equal width with tabular-nums on.
+  </p>
+
+  <h2>Part 1 · Serif on stat tiles</h2>
+  <div id="serifs"></div>
+
+  <h2>Part 2 · Sans with Libre Bodoni</h2>
+  <div id="sans"></div>
+</main>
+
+<script>
+const SERIFS = [
+  { fam: "Libre Bodoni", w: 400, note: "chosen" },
+  { fam: "Libre Bodoni", w: 500, note: "slightly sturdier for projector" },
+  { fam: "Cormorant Garamond", w: 300, note: "original spec, light" },
+  { fam: "Cormorant Garamond", w: 400, note: "original spec, regular" },
+];
+const SANS = [
+  { fam: "Hanken Grotesk", note: "Swiss grotesk, quiet warmth" },
+  { fam: "Libre Franklin", note: "Franklin Gothic lineage, editorial" },
+  { fam: "Red Hat Text", note: "humanist, drawn for small sizes" },
+  { fam: "Atkinson Hyperlegible Next", note: "high legibility, instrument-like" },
+  { fam: "Commissioner", note: "variable grotesk, subtle character" },
+  { fam: "Inter", note: "baseline reference only" },
+];
+const ATTRS = ["COVERAGE", "REFLECTION vs. BARE", "UNEVEN SKINTONE", "POWDERY", "CAKEY", "FLAKE", "IMBED INTO LINES", "CLOG INTO PORES"];
+
+const tiles = () => `
+  <div class="tiles">
+    <div class="tile"><div class="v">85%</div><div class="l">Accuracy — AI vs. panel</div></div>
+    <div class="tile"><div class="v">53</div><div class="l">Formulas covered</div></div>
+    <div class="tile"><div class="v">~70%</div><div class="l">Time saved</div></div>
+  </div>`;
+
+const names = () => `
+  <div class="names">
+    <span class="main">NARS LightR</span>
+    <span class="chip"><i class="dot" style="background:var(--p1)"></i>NARS LightR</span>
+    <span class="chip"><i class="dot" style="background:var(--p2)"></i>LANCOME TIU</span>
+    <span class="chip"><i class="dot" style="background:var(--p3)"></i>YSL All Hours</span>
+  </div>`;
+
+const detail = () => `
+  <div class="detail">
+    <div>
+      <div class="yaxis"><span>0</span><span>1.0</span><span>2.0</span><span>3.0</span><span>4.0</span><span>5.0</span><span>6.0</span></div>
+      <div class="axis">${ATTRS.map((a) => `<span>${a.replace(" vs. ", "<br>vs. ")}</span>`).join("")}</div>
+      <div class="digits">0123456789 · 3.2 4.1 0.6 1.5 · 84.7% · 21 / 24 · MAE 0.23 · Il1 O0</div>
+    </div>
+    <div class="attrs"><div class="sec">Attributes</div>${ATTRS.map((a) => `<div>${a}</div>`).join("")}</div>
+    <div class="tip">
+      <div><span class="n">NARS LightR</span><span class="t">T3</span></div>
+      <div class="a">COVERAGE</div>
+      <div class="r"><span>AI</span><span>3.1</span></div>
+      <div class="r"><span>Panel</span><span>3.2</span></div>
+      <div class="r"><span>Δ</span><span>−0.1</span></div>
+      <div class="ok">within tolerance</div>
+    </div>
+  </div>`;
+
+function hasTnum(fam) {
+  const c = document.createElement("canvas").getContext("2d");
+  const el = document.createElement("span");
+  el.style.cssText = `font-family:'${fam}';font-size:40px;font-variant-numeric:tabular-nums;position:absolute;visibility:hidden;white-space:pre`;
+  document.body.appendChild(el);
+  const widths = "0123456789".split("").map((d) => { el.textContent = d.repeat(6); return el.getBoundingClientRect().width; });
+  el.remove();
+  return Math.max(...widths) - Math.min(...widths) < 0.5;
+}
+
+const serifBox = document.getElementById("serifs");
+for (const s of SERIFS) {
+  serifBox.insertAdjacentHTML("beforeend", `
+    <section class="spec" style="--f-serif:'${s.fam}'; --f-serif-w:${s.w}; --f-sans:'Hanken Grotesk'">
+      <div class="spec-label"><b>${s.fam} ${s.w}</b><span>${s.note}</span></div>
+      ${tiles()}${names()}
+    </section>`);
+}
+
+const sansBox = document.getElementById("sans");
+for (const s of SANS) {
+  sansBox.insertAdjacentHTML("beforeend", `
+    <section class="spec" style="--f-serif:'Libre Bodoni'; --f-serif-w:400; --f-sans:'${s.fam}'">
+      <div class="spec-label"><b>${s.fam}</b><span>${s.note}</span><span class="tag" data-tnum="${s.fam}">tnum …</span></div>
+      ${tiles()}${detail()}
+    </section>`);
+}
+
+document.fonts.ready.then(async () => {
+  await Promise.all(SANS.map((s) => document.fonts.load(`400 16px '${s.fam}'`)));
+  document.querySelectorAll("[data-tnum]").forEach((tag) => {
+    const ok = document.fonts.check(`400 16px '${tag.dataset.tnum}'`) && hasTnum(tag.dataset.tnum);
+    tag.textContent = ok ? "tnum ✓" : "tnum ✗ / not loaded";
+    tag.classList.add(ok ? "ok" : "no");
+  });
+});
+</script>
+</body>
+</html>

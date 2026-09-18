@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Font check — is this really Libre Bodoni?</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Bodoni:wght@400&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'LB Local';
+    font-weight: 400;
+    src: url('../fonts/libre-bodoni-latin.woff2') format('woff2');
+  }
+  :root { --paper:#F5F3F7; --ink:#2A2634; --ink2:#6E6878; --hair:#DCD9E0; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:system-ui, sans-serif; }
+  main { padding:48px 56px 96px; }
+  h1 { font-size:14px; letter-spacing:.06em; color:var(--ink2); font-weight:500; margin:0 0 6px; }
+  .lede { font-size:13px; color:var(--ink2); max-width:760px; line-height:1.6; margin:0 0 40px; }
+  .row { padding:26px 0; border-bottom:1px solid var(--hair); }
+  .meta { font-size:12px; color:var(--ink2); margin-bottom:14px; }
+  .meta b { color:var(--ink); font-size:13px; }
+  .big { font-size:52px; line-height:1.1; font-weight:400; }
+  .num { font-size:76px; line-height:1; font-weight:400; }
+  .r1 { font-family:'Libre Bodoni', serif; }
+  .r2 { font-family:'LB Local', serif; }
+  .r3 { font-family:Georgia, serif; }
+  .r4 { font-family:'Times New Roman', serif; }
+  .verdict { margin-top:40px; font-size:13px; line-height:1.7; color:var(--ink2); max-width:760px; }
+  .verdict b { color:var(--ink); }
+  code { font-family:ui-monospace, Menlo, monospace; font-size:12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>FONT CHECK</h1>
+  <p class="lede">
+    Row 1 pulls Libre Bodoni live from Google Fonts. Row 2 uses the .woff2 file shipped in this
+    project's <code>fonts/</code> folder — the same bytes that are embedded in index.html.
+    If rows 1 and 2 look identical, the dashboard is rendering real Libre Bodoni.
+    Rows 3 and 4 are the fallbacks the page would drop to if the font failed to load.
+  </p>
+
+  <div class="row">
+    <div class="meta"><b>1 · Libre Bodoni</b> — live from Google Fonts (reference)</div>
+    <div class="big r1">Foundation Affinity × AI-lization</div>
+    <div class="num r1">83% 53 ~70% 88%</div>
+  </div>
+
+  <div class="row">
+    <div class="meta"><b>2 · Libre Bodoni</b> — this project's own woff2 (what the dashboard ships)</div>
+    <div class="big r2">Foundation Affinity × AI-lization</div>
+    <div class="num r2">83% 53 ~70% 88%</div>
+  </div>
+
+  <div class="row">
+    <div class="meta"><b>3 · Georgia</b> — the first fallback, if Libre Bodoni failed</div>
+    <div class="big r3">Foundation Affinity × AI-lization</div>
+    <div class="num r3">83% 53 ~70% 88%</div>
+  </div>
+
+  <div class="row">
+    <div class="meta"><b>4 · Times New Roman</b> — the second fallback</div>
+    <div class="big r4">Foundation Affinity × AI-lization</div>
+    <div class="num r4">83% 53 ~70% 88%</div>
+  </div>
+
+  <p class="verdict" id="verdict">measuring…</p>
+</main>
+
+<script>
+function width(fam) {
+  const s = document.createElement("span");
+  s.style.cssText = "position:absolute;visibility:hidden;white-space:pre;font-size:200px;font-weight:400;font-family:" + fam;
+  s.textContent = "Foundation Affinity 83%";
+  document.body.appendChild(s);
+  const w = s.getBoundingClientRect().width;
+  s.remove();
+  return w;
+}
+document.fonts.ready.then(async () => {
+  await Promise.all([
+    document.fonts.load("400 200px 'Libre Bodoni'"),
+    document.fonts.load("400 200px 'LB Local'"),
+  ]);
+  const a = width("'Libre Bodoni'"), b = width("'LB Local'"), g = width("Georgia"), t = width("'Times New Roman'");
+  const same = Math.abs(a - b) < 1;
+  document.getElementById("verdict").innerHTML =
+    "Measured at 200px: Google <b>" + a.toFixed(1) + "px</b> · project file <b>" + b.toFixed(1) +
+    "px</b> · Georgia " + g.toFixed(1) + "px · Times " + t.toFixed(1) + "px.<br>" +
+    (same
+      ? "<b>The project file is the same font as Google's Libre Bodoni.</b> If the dashboard still looks wrong to you, the copy you opened is an older one — reload it, or check that you opened the index.html that was written most recently."
+      : "<b>The project file does NOT match Google's Libre Bodoni.</b> The shipped woff2 is the wrong file.");
+});
+</script>
+</body>
+</html>
