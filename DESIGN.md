@@ -84,7 +84,7 @@ Never use color to mark "ours" vs "market" — see §6.1.
 
 1. **Segmented time control thumb.** A solid surface-colored capsule with a 1px edge, sitting in a recessed track (track = ink at ~4%, no inner shadow on the thumb). Flat and modern, not glossy: no inner shadow, no top highlight, no gradient. The affordance comes from the thumb reading as a physical object in a track, plus `cursor: grab` / `grabbing`, and a slight scale-down (~0.98) while dragging.
 2. **Product image in the right panel** (§8.1): a very light drop shadow, so it sits on the page like an object.
-3. **Transient overlays — smoked vellum.** The two tooltips (chart `.tip`, stat tile `.tile-tip`) are the only glass on the page: a 6% **ink** tint over `blur(12px) saturate(1.2) brightness(1.07)`, no border, plus a soft drop (`0 6px 20px` ink @ 8%). The tint is ink rather than white on purpose — a white translucency on `#F5F3F7` has no luminance to trade on and the plate disappears over blank paper, so the plate reads a shade **darker** than the paper and keeps its edge everywhere; `brightness()` washes the chart out underneath so 12px labels stay clean. Tokens: `--glass`, `--glass-blur`, `--glass-drop`. This applies **only to overlays that follow the pointer and leave** — standing surfaces (right panel, dropdown, thumb, legend key) stay opaque paper with a 1px edge, which is what keeps the glass legible as "this is temporary."
+3. **Transient overlays — smoked vellum.** The two tooltips (chart `.tip`, stat tile `.tile-tip`) are the only glass on the page: a 3% **ink** tint over `blur(12px) saturate(1.2) brightness(1.07)`, no border, plus a soft drop (`0 6px 20px` ink @ 12%). The tint is ink rather than white on purpose — a white translucency on `#F5F3F7` has no luminance to trade on and the plate disappears over blank paper, so the plate reads a shade **darker** than the paper and keeps its edge everywhere; `brightness()` washes the chart out underneath so 12px labels stay clean. Tokens: `--glass`, `--glass-blur`, `--glass-drop`. This applies **only to overlays that follow the pointer and leave** — standing surfaces (right panel, dropdown, thumb, legend key) stay opaque paper with a 1px edge, which is what keeps the glass legible as "this is temporary."
 
 Everything else is flat: no card shadows, no gradients as decoration, no glow. Hierarchy is carried by hairlines, surface color and whitespace.
 
@@ -259,7 +259,7 @@ It is **computed from the data**, not written into the markup, so it stays true 
 
 ### 7.3 Interactions
 
-**Point hover** (any series, any line): both the AI and panel points of that series at that attribute enlarge/highlight, and a tooltip appears:
+**Point hover** (the main product's marks only): the target is the **mark, not the column** — within ~15px of the main product's AI or panel point at an attribute. Crossing the plot at any other height triggers nothing, so the highlight reads as an answer to a gesture rather than something that follows the cursor around. Both the AI and panel points at that attribute enlarge/highlight, and a tooltip appears:
 
 ```
 NARS LightR · T3          (serif name, small time tag)
@@ -271,9 +271,9 @@ Match.
 ```
 The third row is labelled **`Diff`**, never `Δ`: neither Libre Bodoni nor Red Hat Text carries a Greek delta (Google ships latin / latin-ext only), so `Δ` would fall back to a system font — one stray glyph in the wrong typeface, most visibly on the Windows machine this is presented from.
 
-Tooltip in a small surface card, ink text, Red Hat Text tabular numbers. The closing line reads **"Match."** and appears only when the pair is accepted (no negative wording when not — just omit the line).
+Tooltip on smoked-vellum glass (§3.3), ink text, Red Hat Text tabular numbers. The closing line reads **"Match."** and appears only when the pair is accepted (no negative wording when not — just omit the line).
 
-**Line hover on a comparator:** only the hovered line (e.g. the panel line of product 2) rises to 100% opacity and gains ~0.5px weight. Its sibling line (the AI line of the same product) stays as-is. Leave restores.
+**Line hover on a comparator:** only the hovered line (e.g. the panel line of product 2) rises to 100% opacity and gains ~0.5px weight. Its sibling line (the AI line of the same product) stays as-is. Leave restores. It lifts **that line and nothing else** — no attribute band, no tooltip: those belong to the main product's marks, and a comparator line must not speak for them. One exception: a main-product mark passing under the line's 16px hit stroke wins, because the stroke would otherwise swallow the point it crosses.
 
 **Click on a comparator line:** that product **swaps rank with the main product** — colors, z-order, opacity, fill band, value labels, legend order, and chip order all swap together, animated (~500 ms). This is the same operation as dragging the chip/legend entry to position 1.
 

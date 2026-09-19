@@ -32,9 +32,9 @@
      the plate reads a shade darker than the paper, so it still holds an edge
      over blank ground where a white translucency would vanish. brightness()
      washes the chart out underneath and keeps the 12px labels clean. */
-  --glass:rgba(47,41,61,.06);
+  --glass:rgba(47,41,61,.03);
   --glass-blur:12px;
-  --glass-drop:0 6px 20px rgba(47,41,61,.08);
+  --glass-drop:0 6px 20px rgba(47,41,61,0.12);
 
   --serif:'Libre Bodoni', Georgia, 'Times New Roman', serif;
   --sans:'Red Hat Text', 'Segoe UI', system-ui, sans-serif;
@@ -224,7 +224,7 @@ html, body {
 
 /* ── Right panel — the one card on screen ─────────────────────────────────── */
 .panel {
-  background:var(--surface); border:1px solid var(--edge); border-radius:4px;
+  background:var(--surface); border:1px solid var(--edge); border-radius:12px;
   padding:var(--s5) var(--s6); display:flex; flex-direction:column; min-height:0;
 }
 .panel-head { display:flex; gap:var(--s5); align-items:flex-start; }
@@ -285,10 +285,10 @@ html { caret-color:var(--p1); scrollbar-color:var(--hair) transparent; scrollbar
 .tile-tip {
   position:absolute; top:calc(100% + 14px); z-index:6;
   max-width:340px; padding:var(--s3) var(--s4);
-  background:var(--glass); border-radius:4px; box-shadow:var(--glass-drop);
+  background:var(--glass); border-radius:8px; box-shadow:var(--glass-drop);
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.2) brightness(1.07);
   backdrop-filter:blur(var(--glass-blur)) saturate(1.2) brightness(1.07);
-  font-size:15px; font-weight:300; line-height:1.45; color:var(--ink-2); letter-spacing:.012em;
+  font-size:16px; font-weight:400; line-height:1.45; color:var(--ink-2); letter-spacing:.012em;
   opacity:0; visibility:hidden; transition:opacity .16s var(--ease), visibility 0s linear .16s;
 }
 .tile-tip.on { opacity:1; visibility:visible; transition-delay:0s; }
@@ -338,21 +338,21 @@ html { caret-color:var(--p1); scrollbar-color:var(--hair) transparent; scrollbar
 .tip {
   position:absolute; z-index:7; pointer-events:none; min-width:186px;
   padding:var(--s3) var(--s4) var(--s3);
-  background:var(--glass); border-radius:4px; box-shadow:var(--glass-drop);
+  background:var(--glass); border-radius:8px; box-shadow:var(--glass-drop);
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.2) brightness(1.07);
   backdrop-filter:blur(var(--glass-blur)) saturate(1.2) brightness(1.07);
   opacity:0; visibility:hidden; transition:opacity .16s var(--ease), visibility 0s linear .16s;
 }
 .tip.on { opacity:1; visibility:visible; transition-delay:0s; }
 .tip-name { font-family:var(--serif); font-weight:400; font-size:19px; font-variant-numeric:normal; }
-.tip-time { font-size:13px; font-weight:300; color:var(--ink-2); margin-left:var(--s2); }
+.tip-time { font-size:14px; font-weight:400; color:var(--ink-2); margin-left:var(--s2); }
 .tip-attr { font-size:12px; letter-spacing:.1em; color:var(--ink-2); margin:var(--s2) 0 var(--s3); }
-.tip-grid { display:grid; grid-template-columns:auto 1fr; gap:3px var(--s5); font-size:15px; font-weight:300; }
-.tip-grid b { font-weight:300; color:var(--ink-2); }
+.tip-grid { display:grid; grid-template-columns:auto 1fr; gap:3px var(--s5); font-size:15px; font-weight:400; }
+.tip-grid b { font-weight:400; color:var(--ink-2); }
 .tip-grid span { text-align:right; color:var(--ink); }
 .tip-match { font-family:var(--serif); font-size:16px; margin-top:var(--s3); font-variant-numeric:normal; }
 .tip-comps { margin-top:var(--s3); padding-top:var(--s3); border-top:1px solid var(--hair); display:flex; flex-direction:column; gap:5px; }
-.tip-comp { display:flex; align-items:center; gap:var(--s2); font-size:13.5px; font-weight:300; color:var(--ink-2); }
+.tip-comp { display:flex; align-items:center; gap:var(--s2); font-size:13.5px; font-weight:400; color:var(--ink-2); }
 .tip-comp i { width:6px; height:6px; border-radius:50%; flex:none; }
 .tip-comp em { font-style:normal; flex:1; white-space:nowrap; }
 
@@ -1221,12 +1221,36 @@ html { caret-color:var(--p1); scrollbar-color:var(--hair) transparent; scrollbar
     var i = Math.round((x - L.pad.l - L.inset) / L.step);
     return Math.max(0, Math.min(N - 1, i));
   }
-  hitRect.addEventListener("mousemove", function (e) { setHover(attrAt(e.clientX)); });
+  /* §7.3 is point hover, not column hover: the target is the mark, not the
+     air above and below it. A column-wide target means crossing the plot at
+     any height lights something up, so the highlight never reads as an
+     answer to a gesture — it just follows the cursor around. Both of the
+     main product's marks at an attribute are live (AI and panel), tested
+     against `disp` so the targets travel with the curves during a flow. */
+  var DOT_HIT = 15;                    /* ≈ 3× the 4.2px mark: findable, still a point */
+  function dotAt(clientX, clientY) {
+    var g = mainInfo && groups[mainInfo.key];
+    if (!g) return null;
+    var box = svg.getBoundingClientRect(), scale = box.width / L.W || 1;
+    var x = (clientX - box.left) / scale, y = (clientY - box.top) / scale;
+    var i = attrAt(clientX), dx = x - L.X(i);
+    if (Math.abs(dx) > DOT_HIT) return null;
+    var vals = [g.disp[i].ai, g.disp[i].panel];
+    for (var k = 0; k < vals.length; k++) {
+      var dy = y - L.Y(vals[k]);
+      if (dx * dx + dy * dy <= DOT_HIT * DOT_HIT) return i;
+    }
+    return null;
+  }
+  hitRect.addEventListener("mousemove", function (e) { setHover(dotAt(e.clientX, e.clientY)); });
   hitRect.addEventListener("mouseleave", function () { setHover(null); });
 
   /* Comparator lines carry their own transparent hit stroke, wide enough to
-     catch from a podium, sitting above the column target so a line always wins
-     over the column it crosses. */
+     catch from a podium. Hovering one lifts that line and nothing else: the
+     attribute highlight and the tooltip belong to the main product's marks,
+     so a comparator line must not speak for them. The one exception is a
+     main-product mark passing under the stroke — the stroke is 16px wide and
+     would otherwise swallow the point it crosses, so the mark wins. */
   function buildLineHits() {
     clear(hitG);
     Object.keys(groups).forEach(function (k) { groups[k].n.hitAi = groups[k].n.hitPn = null; });
@@ -1236,7 +1260,11 @@ html { caret-color:var(--p1); scrollbar-color:var(--hair) transparent; scrollbar
       ["ai", "pn"].forEach(function (which) {
         var p = node("path", { "class": "line-hit", fill: "none", stroke: "transparent",
           "stroke-width": 16, "pointer-events": "stroke" });
-        p.addEventListener("mousemove", function (e) { hoverLine = w.key + ":" + which; setHover(attrAt(e.clientX)); paintSeries(); });
+        p.addEventListener("mousemove", function (e) {
+          var d = dotAt(e.clientX, e.clientY);
+          if (d !== null) { hoverLine = null; setHover(d); paintSeries(); return; }
+          hoverLine = w.key + ":" + which; setHover(null); paintSeries();
+        });
         p.addEventListener("mouseleave", function () { hoverLine = null; paintSeries(); });
         p.addEventListener("click", function () { hoverLine = null; promote(w); });
         hitG.appendChild(p);
