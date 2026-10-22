@@ -1,0 +1,607 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-22T00:24:16.690Z",
+  "title": "Design System: Foundation Affinity × AI-lization",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Lilac Paper",
+        "canonical": "#F5F3F7",
+        "oklch": "oklch(96.7% 0.006 308.4)",
+        "purpose": "Page ground; Sig-only veil.",
+        "tonalRamp": [
+          "#0C0B0D",
+          "#252326",
+          "#434245",
+          "#646266",
+          "#878589",
+          "#ACAAAE",
+          "#CFCDD1",
+          "#EFEDF1"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Vellum White",
+        "canonical": "#FCFBFD",
+        "oklch": "oklch(98.9% 0.003 308.4)",
+        "purpose": "Standing surfaces: menus, pills, mode-switch thumb, knobs.",
+        "tonalRamp": [
+          "#0B0B0C",
+          "#242425",
+          "#434243",
+          "#646364",
+          "#868687",
+          "#ABAAAC",
+          "#CECDCF",
+          "#EFEEF0"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "White",
+        "canonical": "#FFFFFF",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "purpose": "Bench pill and baseline time toggle only (formerly --corridor; the corridor is removed).",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#242424",
+          "#424242",
+          "#636363",
+          "#868686",
+          "#ABABAB",
+          "#CECECE",
+          "#EEEEEE"
+        ]
+      },
+      "edge": {
+        "role": "neutral",
+        "displayName": "Edge",
+        "canonical": "#E6E3EB",
+        "oklch": "oklch(92.0% 0.011 303.1)",
+        "purpose": "1px outline of standing surfaces.",
+        "tonalRamp": [
+          "#0C0A0F",
+          "#252329",
+          "#434147",
+          "#646269",
+          "#87858C",
+          "#ACA9B1",
+          "#CFCCD4",
+          "#F0EDF5"
+        ]
+      },
+      "hair": {
+        "role": "neutral",
+        "displayName": "Hair",
+        "canonical": "#DCD9E0",
+        "oklch": "oklch(89.0% 0.010 305.4)",
+        "purpose": "Column hairlines, section rules, chart verticals.",
+        "tonalRamp": [
+          "#0C0A0F",
+          "#252328",
+          "#444147",
+          "#646268",
+          "#87858B",
+          "#ACA9B0",
+          "#CFCCD3",
+          "#F0EDF4"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#2A2537",
+        "oklch": "oklch(27.8% 0.033 296.9)",
+        "purpose": "Text, ruler, band numerals, library-strip dots.",
+        "tonalRamp": [
+          "#0D0817",
+          "#262132",
+          "#443F52",
+          "#656074",
+          "#888298",
+          "#ADA7BE",
+          "#D0CAE2",
+          "#F0EBFE"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink 2",
+        "canonical": "#6B5E82",
+        "oklch": "oklch(50.8% 0.058 300.9)",
+        "purpose": "Secondary text, attribute labels, polarity arrows, captions, placeholder rows.",
+        "tonalRamp": [
+          "#10041F",
+          "#291D3B",
+          "#483B5D",
+          "#695C80",
+          "#8C7EA4",
+          "#B1A3CA",
+          "#D4C6EF",
+          "#F1EBFF"
+        ]
+      },
+      "series-a-violet": {
+        "role": "primary",
+        "displayName": "Brand Violet",
+        "canonical": "#625492",
+        "oklch": "oklch(48.7% 0.098 292.8)",
+        "purpose": "Series A; Sig-only on; focus, caret, selection; drop zone; Uploaded wash and New tag.",
+        "tonalRamp": [
+          "#0F002A",
+          "#27164E",
+          "#453671",
+          "#655896",
+          "#887BBC",
+          "#AD9FE4",
+          "#CFC5FC",
+          "#EFECFF"
+        ]
+      },
+      "series-b-slate": {
+        "role": "secondary",
+        "displayName": "Weathered Slate",
+        "canonical": "#61829E",
+        "oklch": "oklch(59.2% 0.057 244.6)",
+        "purpose": "Series B only.",
+        "tonalRamp": [
+          "#000C1A",
+          "#06263D",
+          "#26455F",
+          "#476782",
+          "#698AA7",
+          "#8DAFCD",
+          "#AFD3F1",
+          "#E1F1FE"
+        ]
+      },
+      "bench-line": {
+        "role": "neutral",
+        "displayName": "Bench Grey-Violet",
+        "canonical": "#8E85A2",
+        "oklch": "oklch(63.5% 0.044 299.3)",
+        "purpose": "Baseline series line and hollow markers only (dashed 5 4, 1.5px).",
+        "tonalRamp": [
+          "#0E061B",
+          "#271F36",
+          "#463D57",
+          "#675E79",
+          "#8A819D",
+          "#AEA5C3",
+          "#D1C8E7",
+          "#F1EBFE"
+        ]
+      },
+      "better-sage": {
+        "role": "tertiary",
+        "displayName": "Morandi Sage",
+        "canonical": "#74936C",
+        "oklch": "oklch(62.9% 0.067 139.3)",
+        "purpose": "Better: halos, list-head dot, verdict underline.",
+        "tonalRamp": [
+          "#021000",
+          "#102B09",
+          "#2F4B27",
+          "#4F6D48",
+          "#719069",
+          "#95B68D",
+          "#B8D9AF",
+          "#D8FACF"
+        ]
+      },
+      "worse-clay": {
+        "role": "tertiary",
+        "displayName": "Clay Red",
+        "canonical": "#B15D59",
+        "oklch": "oklch(57.6% 0.110 23.9)",
+        "purpose": "Worse: halos, list-head dot, verdict underline.",
+        "tonalRamp": [
+          "#1F0001",
+          "#4A0309",
+          "#722424",
+          "#984744",
+          "#BF6A65",
+          "#E88F89",
+          "#FDBAB5",
+          "#FFE9E7"
+        ]
+      },
+      "a-wash": {
+        "role": "neutral",
+        "displayName": "Violet Wash",
+        "canonical": "rgba(98,84,146,.10)",
+        "purpose": "Series A pill ground; Uploaded rows; drop-zone hover."
+      },
+      "b-wash": {
+        "role": "neutral",
+        "displayName": "Slate Wash",
+        "canonical": "rgba(97,130,158,.12)",
+        "purpose": "Series B pill ground."
+      },
+      "tint": {
+        "role": "neutral",
+        "displayName": "Ink Tint",
+        "canonical": "rgba(42,37,55,.045)",
+        "purpose": "The one hover / pressed ground; mode-switch and mini-segment track."
+      },
+      "glass": {
+        "role": "neutral",
+        "displayName": "Smoked Vellum",
+        "canonical": "rgba(47,41,61,.035)",
+        "purpose": "Glass plate fill under backdrop-filter."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The title only (Libre Bodoni 400, 35px)."
+      },
+      "sentence": {
+        "displayName": "Sentence",
+        "purpose": "Italic connective words of the control sentence; 29px when tight."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Library heading; section heads step 22 / 21 / 20 / 19px."
+      },
+      "verdict": {
+        "displayName": "Verdict",
+        "purpose": "Bodoni 21px / 1.45 caption to the chart; italic ink 2 as the prompt."
+      },
+      "tally-numeral": {
+        "displayName": "Tally numeral",
+        "purpose": "n better · n worse · n on par, with 14px words."
+      },
+      "findings-head": {
+        "displayName": "Findings head",
+        "purpose": "Better / Worse list heads, with an 18px halo swatch."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Drop-zone title."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Upload counter; 46px in the model card; 19px ruler integers."
+      },
+      "band-numeral": {
+        "displayName": "Band numeral",
+        "purpose": "T0 / T3 / T6 at .13 opacity, right-aligned in the lower-right corner of each Comparison block, inside the plot."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Formula IDs in library rows; tooltips at 15.5px; tally IDs at 15px ink 2."
+      },
+      "id": {
+        "displayName": "ID in pill",
+        "purpose": "Formula ID inside a sentence pill."
+      },
+      "subtitle": {
+        "displayName": "Subtitle",
+        "purpose": "Top-bar subtitle, light 300."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Chart caption, tool labels, counts, model-card text."
+      },
+      "attribute": {
+        "displayName": "Attribute",
+        "purpose": "Uppercase attribute names in the chart (17px / 1.1px in Dynamic), ink 2, weight 400."
+      },
+      "label-caps": {
+        "displayName": "Caps label",
+        "purpose": "Uppercase attribute names in tooltips."
+      },
+      "list-attribute": {
+        "displayName": "List attribute",
+        "purpose": "Findings list attribute, uppercase, ink 2; time 14px; signed difference 15px / 500."
+      }
+    },
+    "shadows": [
+      {
+        "name": "lift",
+        "value": "0 8px 22px rgba(42,37,55,.10), 0 1px 2px rgba(42,37,55,.06)",
+        "purpose": "Mode-switch thumb."
+      },
+      {
+        "name": "menu",
+        "value": "0 10px 22px rgba(42,37,55,.12), 0 1px 3px rgba(42,37,55,.06)",
+        "purpose": "Floating dropdown menus, with a 1px edge."
+      },
+      {
+        "name": "vellum-drop",
+        "value": "0 10px 28px rgba(42,37,55,.13), 0 1px 2px rgba(42,37,55,.06), inset 0 1px 0 rgba(255,255,255,.65)",
+        "purpose": "Smoked-vellum glass; pair with backdrop-filter blur(14px) saturate(1.2) brightness(1.07) over rgba(47,41,61,.035)."
+      },
+      {
+        "name": "bench-rest",
+        "value": "0 1px 0 rgba(42,37,55,.04)",
+        "purpose": "Bench pill footing."
+      },
+      {
+        "name": "knob",
+        "value": "0 1px 2px rgba(42,37,55,.25)",
+        "purpose": "Sig-only switch knob."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16,1,.3,1)",
+        "purpose": "The one curve for every transition; JS uses the matching exponential ease-out."
+      },
+      {
+        "name": "d-fast",
+        "value": ".16s",
+        "purpose": "Hover grounds."
+      },
+      {
+        "name": "d-state",
+        "value": ".3s",
+        "purpose": "Borders, toggles, veils."
+      },
+      {
+        "name": "d-flow",
+        "value": ".65s",
+        "purpose": "Lines flowing to new values."
+      },
+      {
+        "name": "thumb",
+        "value": ".5s",
+        "purpose": "Mode-switch thumb glide."
+      },
+      {
+        "name": "vellum",
+        "value": ".18s",
+        "purpose": "Glass fade in and out."
+      },
+      {
+        "name": "menu",
+        "value": ".2s",
+        "purpose": "Menu open / close."
+      },
+      {
+        "name": "arrival",
+        "value": ".7s, stagger .06 / .14 / .22 / .30s",
+        "purpose": "Regions arriving on load."
+      },
+      {
+        "name": "draw",
+        "value": "1.0s (1.3s on the first comparison)",
+        "purpose": "Series drawing down the chart."
+      },
+      {
+        "name": "ink-drop",
+        "value": ".9s",
+        "purpose": "A newly filled pill floods from its glyph."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stage",
+        "value": "1920 × 1050 fixed, scaled to fit; no reflow"
+      }
+    ],
+    "chart": {
+      "series": {
+        "base": {
+          "color": "#8E85A2",
+          "width": 1.5,
+          "markerR": 3.3,
+          "hollow": true,
+          "dash": "5 4"
+        },
+        "a": {
+          "color": "#625492",
+          "width": 2.2,
+          "markerR": 3.7
+        },
+        "b": {
+          "color": "#61829E",
+          "width": 2.2,
+          "markerR": 3.7
+        }
+      },
+      "halo": {
+        "r": 11,
+        "liftScale": 1.25,
+        "gradientStops": [
+          0.72,
+          0.42,
+          0
+        ],
+        "ringOpacity": 0.5
+      },
+      "markerLiftScale": 1.6,
+      "corridor": null,
+      "linesContinuousAcrossBlocks": true,
+      "significance": "Halos only; the tooltip states beyond / within the ±x threshold.",
+      "key": {
+        "items": [
+          "Better",
+          "Worse"
+        ],
+        "swatch": "halo r 8.5 with ink dot r 3",
+        "type": "Red Hat Text 15px ink-2",
+        "itemGap": 20,
+        "comparison": "on the T6 band numeral baseline, 22px left of it",
+        "dynamic": "plot lower-right (x plotR - keyWidth - 6, y H - 16)"
+      },
+      "tooltipOnPar": "ink-2 ring r 3.4, stroke 1.2",
+      "ruler": {
+        "lineOpacity": 0.55,
+        "majorTickOpacity": 0.7,
+        "minorTickOpacity": 0.38,
+        "numeralSize": 19
+      },
+      "bandNumeral": {
+        "size": 66,
+        "opacity": 0.13,
+        "anchor": "end",
+        "x": "plotR - 18",
+        "y": "block bottom - 12"
+      },
+      "plot": {
+        "plotL": 30,
+        "plotR": "W - 214",
+        "labelX": "plotR + 24",
+        "polarityArrows": false,
+        "polarityInWords": [
+          "tooltips",
+          "lists",
+          "strip tooltip: Higher / Lower is better"
+        ]
+      },
+      "rowHighlight": "rgba(98,84,146,.075)",
+      "linkLine": {
+        "dash": "2 3",
+        "width": 1.1,
+        "opacity": 0.7
+      }
+    },
+    "layout": {
+      "findTop": "verdict + tally + lists top-aligned; strips 28px below stretch row pitch 24–46px to fill the column; verdict no min-height; tally margin-top 24px",
+      "stagePadding": "30px 56px 34px",
+      "topBar": "64px",
+      "library": "348px, 44px + 52px around its hairline",
+      "content": "1.42fr : 1fr, 48px + 52px around its hairline",
+      "sentenceBand": "84px"
+    }
+  },
+  "components": [
+    {
+      "name": "Bench Pill",
+      "kind": "chip",
+      "refersTo": "pill-bench",
+      "description": "The bench slot: white, ink edge, italic Bench caption, no remove button.",
+      "html": "<button class=\"ds-pill ds-pill-bench\"><span class=\"ds-pill-cap\">Bench</span><svg width=\"24\" height=\"12\" viewBox=\"0 0 24 12\" aria-hidden=\"true\"><path d=\"M0 6h24\" stroke=\"#8E85A2\" stroke-width=\"1.5\" stroke-dasharray=\"5 4\"/><circle cx=\"12\" cy=\"6\" r=\"3.3\" fill=\"#fff\" stroke=\"#8E85A2\" stroke-width=\"1.5\"/></svg><span>b53176_NARS #L2</span><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" aria-hidden=\"true\"><path d=\"M3 4.5l3 3 3-3\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button>",
+      "css": ":host{--paper:#F5F3F7;--surface:#FCFBFD;--white:#FFFFFF;--edge:#E6E3EB;--hair:#DCD9E0;--ink:#2A2537;--ink-2:#6B5E82;--a:#625492;--b:#61829E;--better:#74936C;--worse:#B15D59;--a-wash:rgba(98,84,146,.10);--b-wash:rgba(97,130,158,.12);--tint:rgba(42,37,55,.045);--glass:rgba(47,41,61,.035);--glass-filter:blur(14px) saturate(1.2) brightness(1.07);--glass-drop:0 10px 28px rgba(42,37,55,.13),0 1px 2px rgba(42,37,55,.06),inset 0 1px 0 rgba(255,255,255,.65);--lift:0 8px 22px rgba(42,37,55,.10),0 1px 2px rgba(42,37,55,.06);--serif:'Libre Bodoni',Georgia,serif;--sans:'Red Hat Text','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);} .ds-pill{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 14px 0 16px;border-radius:999px;border:1px solid var(--edge);background:var(--surface);font:500 17px/1 var(--sans);color:var(--ink);font-variant-numeric:lining-nums tabular-nums;cursor:pointer;transition:border-color .3s var(--ease),background .3s var(--ease);} .ds-pill-bench{background:var(--white);border-color:var(--ink);box-shadow:0 1px 0 rgba(42,37,55,.04);} .ds-pill-cap{font:italic 400 17px/24px var(--serif);color:var(--ink-2);padding-right:10px;border-right:1px solid var(--hair);} .ds-pill:hover{background:#fff;} .ds-pill:focus-visible{outline:1.5px solid var(--a);outline-offset:3px;}"
+    },
+    {
+      "name": "Series A Pill",
+      "kind": "chip",
+      "refersTo": "pill-series-a",
+      "description": "A compared formula: violet wash on surface, violet edge, removable.",
+      "html": "<button class=\"ds-pill ds-pill-a\"><svg width=\"24\" height=\"12\" viewBox=\"0 0 24 12\" aria-hidden=\"true\"><path d=\"M0 6h24\" stroke=\"#625492\" stroke-width=\"2.2\"/><circle cx=\"12\" cy=\"6\" r=\"3.7\" fill=\"#625492\"/></svg><span>Lancome TIU #PO_01_Anker 4.15</span><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" aria-hidden=\"true\"><path d=\"M3 4.5l3 3 3-3\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button>",
+      "css": ":host{--paper:#F5F3F7;--surface:#FCFBFD;--white:#FFFFFF;--edge:#E6E3EB;--hair:#DCD9E0;--ink:#2A2537;--ink-2:#6B5E82;--a:#625492;--b:#61829E;--better:#74936C;--worse:#B15D59;--a-wash:rgba(98,84,146,.10);--b-wash:rgba(97,130,158,.12);--tint:rgba(42,37,55,.045);--glass:rgba(47,41,61,.035);--glass-filter:blur(14px) saturate(1.2) brightness(1.07);--glass-drop:0 10px 28px rgba(42,37,55,.13),0 1px 2px rgba(42,37,55,.06),inset 0 1px 0 rgba(255,255,255,.65);--lift:0 8px 22px rgba(42,37,55,.10),0 1px 2px rgba(42,37,55,.06);--serif:'Libre Bodoni',Georgia,serif;--sans:'Red Hat Text','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);} .ds-pill{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 14px 0 16px;border-radius:999px;border:1px solid var(--edge);background:var(--surface);font:500 17px/1 var(--sans);color:var(--ink);cursor:pointer;transition:border-color .3s var(--ease),background .3s var(--ease);} .ds-pill-a{background:linear-gradient(var(--a-wash),var(--a-wash)),var(--surface);border-color:rgba(98,84,146,.42);} .ds-pill-a:hover{border-color:var(--a);} .ds-pill:focus-visible{outline:1.5px solid var(--a);outline-offset:3px;}"
+    },
+    {
+      "name": "Empty Slot",
+      "kind": "chip",
+      "refersTo": "pill-empty",
+      "description": "Dashed slot that keeps the sentence grammatical; breathes when it blocks the chart.",
+      "html": "<button class=\"ds-pill-empty\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" aria-hidden=\"true\"><path d=\"M6 1.5v9M1.5 6h9\" stroke=\"currentColor\" stroke-width=\"1.3\" stroke-linecap=\"round\"/></svg>Choose bench</button>",
+      "css": ":host{--paper:#F5F3F7;--surface:#FCFBFD;--white:#FFFFFF;--edge:#E6E3EB;--hair:#DCD9E0;--ink:#2A2537;--ink-2:#6B5E82;--a:#625492;--b:#61829E;--better:#74936C;--worse:#B15D59;--a-wash:rgba(98,84,146,.10);--b-wash:rgba(97,130,158,.12);--tint:rgba(42,37,55,.045);--glass:rgba(47,41,61,.035);--glass-filter:blur(14px) saturate(1.2) brightness(1.07);--glass-drop:0 10px 28px rgba(42,37,55,.13),0 1px 2px rgba(42,37,55,.06),inset 0 1px 0 rgba(255,255,255,.65);--lift:0 8px 22px rgba(42,37,55,.10),0 1px 2px rgba(42,37,55,.06);--serif:'Libre Bodoni',Georgia,serif;--sans:'Red Hat Text','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);} .ds-pill-empty{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 16px;border-radius:999px;border:1px dashed rgba(42,37,55,.32);background:transparent;font:400 17px/1 var(--sans);color:var(--ink-2);cursor:pointer;transition:border-color .3s var(--ease);animation:ds-breathe 1.5s var(--ease) infinite alternate;} .ds-pill-empty:hover{border-color:var(--ink);color:var(--ink);} .ds-pill-empty:focus-visible{outline:1.5px solid var(--a);outline-offset:3px;} @keyframes ds-breathe{from{box-shadow:0 0 0 0 rgba(98,84,146,0);background:rgba(255,255,255,.2);}to{box-shadow:0 0 0 7px rgba(98,84,146,.09);background:rgba(255,255,255,.9);}} @media (prefers-reduced-motion:reduce){.ds-pill-empty{animation:none;}}"
+    },
+    {
+      "name": "Mode Switch",
+      "kind": "nav",
+      "refersTo": "mode-switch",
+      "description": "Dynamic | Comparison capsule with a lifted sliding thumb.",
+      "html": "<div class=\"ds-modes\"><span class=\"ds-thumb\"></span><button>Dynamic</button><button aria-pressed=\"true\">Comparison</button></div>",
+      "css": ":host{--paper:#F5F3F7;--surface:#FCFBFD;--white:#FFFFFF;--edge:#E6E3EB;--hair:#DCD9E0;--ink:#2A2537;--ink-2:#6B5E82;--a:#625492;--b:#61829E;--better:#74936C;--worse:#B15D59;--a-wash:rgba(98,84,146,.10);--b-wash:rgba(97,130,158,.12);--tint:rgba(42,37,55,.045);--glass:rgba(47,41,61,.035);--glass-filter:blur(14px) saturate(1.2) brightness(1.07);--glass-drop:0 10px 28px rgba(42,37,55,.13),0 1px 2px rgba(42,37,55,.06),inset 0 1px 0 rgba(255,255,255,.65);--lift:0 8px 22px rgba(42,37,55,.10),0 1px 2px rgba(42,37,55,.06);--serif:'Libre Bodoni',Georgia,serif;--sans:'Red Hat Text','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);} .ds-modes{position:relative;display:inline-grid;grid-template-columns:150px 150px;padding:4px;border-radius:999px;background:var(--tint);} .ds-thumb{position:absolute;top:4px;left:4px;width:150px;height:calc(100% - 8px);border-radius:999px;background:var(--surface);border:1px solid var(--edge);box-shadow:var(--lift);transform:translateX(150px);transition:transform .5s var(--ease);} .ds-modes:has(button:first-of-type:hover) .ds-thumb{transform:translateX(0);} .ds-modes button{position:relative;height:42px;border:0;background:none;border-radius:999px;font:400 20px/1 var(--serif);color:var(--ink-2);cursor:pointer;transition:color .3s var(--ease);} .ds-modes button[aria-pressed=\"true\"],.ds-modes button:hover{color:var(--ink);} .ds-modes button:focus-visible{outline:1.5px solid var(--a);outline-offset:3px;}"
+    },
+    {
+      "name": "Toolbar Tool",
+      "kind": "button",
+      "refersTo": "tool",
+      "description": "Ghost capsule action in the chart toolbar, with a drawn icon.",
+      "html": "<button class=\"ds-tool\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M8 2.5v8M4.8 7.6L8 10.8l3.2-3.2M3 13.5h10\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Export PNG</button>",
+      "css": ":host{--paper:#F5F3F7;--surface:#FCFBFD;--white:#FFFFFF;--edge:#E6E3EB;--hair:#DCD9E0;--ink:#2A2537;--ink-2:#6B5E82;--a:#625492;--b:#61829E;--better:#74936C;--worse:#B15D59;--a-wash:rgba(98,84,146,.10);--b-wash:rgba(97,130,158,.12);--tint:rgba(42,37,55,.045);--glass:rgba(47,41,61,.035);--glass-filter:blur(14px) saturate(1.2) brightness(1.07);--glass-drop:0 10px 28px rgba(42,37,55,.13),0 1px 2px rgba(42,37,55,.06),inset 0 1px 0 rgba(255,255,255,.65);--lift:0 8px 22px rgba(42,37,55,.10),0 1px 2px rgba(42,37,55,.06);--serif:'Libre Bodoni',Georgia,serif;--sans:'Red Hat Text','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);} .ds-tool{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:0;border-radius:999px;background:none;font:400 15px/1 var(--sans);color:var(--ink-2);cursor:pointer;transition:background .16s var(--ease),color .16s var(--ease);} .ds-tool:hover{background:var(--tint);color:var(--ink);} .ds-tool:focus-visible{outline:1.5px solid var(--a);outline-offset:3px;}"
+    },
+    {
+      "name": "Sig Only Switch",
+      "kind": "button",
+      "refersTo": "tool",
+      "description": "Toolbar toggle; the switch turns violet when on.",
+      "html": "<button class=\"ds-tool\" aria-pressed=\"true\"><span class=\"ds-switch\"></span>Sig only</button>",
+      "css": ":host{--paper:#F5F3F7;--surface:#FCFBFD;--white:#FFFFFF;--edge:#E6E3EB;--hair:#DCD9E0;--ink:#2A2537;--ink-2:#6B5E82;--a:#625492;--b:#61829E;--better:#74936C;--worse:#B15D59;--a-wash:rgba(98,84,146,.10);--b-wash:rgba(97,130,158,.12);--tint:rgba(42,37,55,.045);--glass:rgba(47,41,61,.035);--glass-filter:blur(14px) saturate(1.2) brightness(1.07);--glass-drop:0 10px 28px rgba(42,37,55,.13),0 1px 2px rgba(42,37,55,.06),inset 0 1px 0 rgba(255,255,255,.65);--lift:0 8px 22px rgba(42,37,55,.10),0 1px 2px rgba(42,37,55,.06);--serif:'Libre Bodoni',Georgia,serif;--sans:'Red Hat Text','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);} .ds-tool{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:0;border-radius:999px;background:none;font:400 15px/1 var(--sans);color:var(--ink-2);cursor:pointer;transition:background .16s var(--ease),color .16s var(--ease);} .ds-tool:hover{background:var(--tint);color:var(--ink);} .ds-tool:focus-visible{outline:1.5px solid var(--a);outline-offset:3px;} .ds-switch{width:34px;height:20px;border-radius:999px;background:rgba(42,37,55,.14);position:relative;transition:background .3s var(--ease);} .ds-switch::after{content:\"\";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(42,37,55,.25);transition:transform .3s var(--ease);} .ds-tool[aria-pressed=\"true\"]{color:var(--ink);} .ds-tool[aria-pressed=\"true\"] .ds-switch{background:var(--a);} .ds-tool[aria-pressed=\"true\"] .ds-switch::after{transform:translateX(14px);}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "Underline-only search; the rule inks on focus.",
+      "html": "<label class=\"ds-search\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 17 17\" aria-hidden=\"true\"><circle cx=\"7.2\" cy=\"7.2\" r=\"5.6\" fill=\"none\" stroke=\"#6B5E82\" stroke-width=\"1.3\"/><path d=\"M11.4 11.4l4 4\" stroke=\"#6B5E82\" stroke-width=\"1.3\" stroke-linecap=\"round\"/></svg><input placeholder=\"Search formulas\"></label>",
+      "css": ":host{--paper:#F5F3F7;--surface:#FCFBFD;--white:#FFFFFF;--edge:#E6E3EB;--hair:#DCD9E0;--ink:#2A2537;--ink-2:#6B5E82;--a:#625492;--b:#61829E;--better:#74936C;--worse:#B15D59;--a-wash:rgba(98,84,146,.10);--b-wash:rgba(97,130,158,.12);--tint:rgba(42,37,55,.045);--glass:rgba(47,41,61,.035);--glass-filter:blur(14px) saturate(1.2) brightness(1.07);--glass-drop:0 10px 28px rgba(42,37,55,.13),0 1px 2px rgba(42,37,55,.06),inset 0 1px 0 rgba(255,255,255,.65);--lift:0 8px 22px rgba(42,37,55,.10),0 1px 2px rgba(42,37,55,.06);--serif:'Libre Bodoni',Georgia,serif;--sans:'Red Hat Text','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);} .ds-search{display:flex;align-items:center;gap:10px;height:46px;width:300px;padding:0 2px;border-bottom:1px solid var(--hair);transition:border-color .3s var(--ease);} .ds-search:focus-within{border-bottom-color:var(--ink);} .ds-search input{flex:1;min-width:0;border:0;outline:0;background:none;font:400 17px var(--sans);color:var(--ink);caret-color:var(--a);padding:0;} .ds-search input::placeholder{color:var(--ink-2);font-weight:300;}"
+    },
+    {
+      "name": "Drop Zone",
+      "kind": "custom",
+      "refersTo": "drop-zone",
+      "description": "Dashed violet import zone; washes violet on hover and page drag.",
+      "html": "<button class=\"ds-drop\"><span class=\"ds-drop-title\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M10 13.5V3.5M6 7.2l4-3.9 4 3.9\" fill=\"none\" stroke=\"#625492\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M3.5 12.5v3a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5v-3\" fill=\"none\" stroke=\"#625492\" stroke-width=\"1.4\" stroke-linecap=\"round\"/></svg>Drop AI readings</span><span class=\"ds-drop-sub\">.xlsx / .csv</span></button>",
+      "css": ":host{--paper:#F5F3F7;--surface:#FCFBFD;--white:#FFFFFF;--edge:#E6E3EB;--hair:#DCD9E0;--ink:#2A2537;--ink-2:#6B5E82;--a:#625492;--b:#61829E;--better:#74936C;--worse:#B15D59;--a-wash:rgba(98,84,146,.10);--b-wash:rgba(97,130,158,.12);--tint:rgba(42,37,55,.045);--glass:rgba(47,41,61,.035);--glass-filter:blur(14px) saturate(1.2) brightness(1.07);--glass-drop:0 10px 28px rgba(42,37,55,.13),0 1px 2px rgba(42,37,55,.06),inset 0 1px 0 rgba(255,255,255,.65);--lift:0 8px 22px rgba(42,37,55,.10),0 1px 2px rgba(42,37,55,.06);--serif:'Libre Bodoni',Georgia,serif;--sans:'Red Hat Text','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);} .ds-drop{display:block;width:300px;text-align:left;padding:18px 20px 16px;border-radius:12px;border:1px dashed rgba(98,84,146,.45);background:transparent;cursor:pointer;transition:background .3s var(--ease),border-color .3s var(--ease);} .ds-drop:hover{background:var(--a-wash);border-color:var(--a);} .ds-drop:focus-visible{outline:1.5px solid var(--a);outline-offset:3px;} .ds-drop-title{display:flex;align-items:center;gap:10px;font:400 21px/1.15 var(--serif);color:var(--ink);} .ds-drop-sub{display:block;margin-top:6px;font:400 15px var(--sans);color:var(--ink-2);}"
+    },
+    {
+      "name": "Library Row",
+      "kind": "card",
+      "refersTo": "library-row-new",
+      "description": "Library list row; uploaded rows carry the violet wash.",
+      "html": "<button class=\"ds-row ds-row-new\"><svg width=\"24\" height=\"12\" viewBox=\"0 0 24 12\" aria-hidden=\"true\"><path d=\"M0 6h24\" stroke=\"#625492\" stroke-width=\"2.2\"/><circle cx=\"12\" cy=\"6\" r=\"3.7\" fill=\"#625492\"/></svg><span class=\"ds-row-id\">Lancome TIU #PO_01_Anker 4.15</span></button><button class=\"ds-row\"><span style=\"width:24px\"></span><span class=\"ds-row-id\">b53176_NARS #L2</span></button>",
+      "css": ":host{--paper:#F5F3F7;--surface:#FCFBFD;--white:#FFFFFF;--edge:#E6E3EB;--hair:#DCD9E0;--ink:#2A2537;--ink-2:#6B5E82;--a:#625492;--b:#61829E;--better:#74936C;--worse:#B15D59;--a-wash:rgba(98,84,146,.10);--b-wash:rgba(97,130,158,.12);--tint:rgba(42,37,55,.045);--glass:rgba(47,41,61,.035);--glass-filter:blur(14px) saturate(1.2) brightness(1.07);--glass-drop:0 10px 28px rgba(42,37,55,.13),0 1px 2px rgba(42,37,55,.06),inset 0 1px 0 rgba(255,255,255,.65);--lift:0 8px 22px rgba(42,37,55,.10),0 1px 2px rgba(42,37,55,.06);--serif:'Libre Bodoni',Georgia,serif;--sans:'Red Hat Text','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);} .ds-row{display:flex;align-items:center;gap:8px;width:320px;min-height:38px;padding:7px 10px;border:0;border-radius:8px;background:none;text-align:left;font:400 16px/1.3 var(--sans);color:var(--ink);cursor:pointer;transition:background .16s var(--ease);} .ds-row:hover{background:var(--tint);} .ds-row-new{background:var(--a-wash);} .ds-row-new:hover{background:rgba(98,84,146,.16);} .ds-row:focus-visible{outline:1.5px solid var(--a);outline-offset:3px;} .ds-row-id{flex:1;}"
+    },
+    {
+      "name": "Vellum Tooltip",
+      "kind": "custom",
+      "refersTo": "vellum-tooltip",
+      "description": "Smoked-vellum glass for everything that follows the pointer and leaves.",
+      "html": "<div class=\"ds-vellum\"><div class=\"ds-tip-head\"><span class=\"ds-caps\">Powdery</span><span class=\"ds-tip-time\">T6</span></div><div class=\"ds-tip-rows\"><svg width=\"24\" height=\"12\" viewBox=\"0 0 24 12\" aria-hidden=\"true\"><path d=\"M0 6h24\" stroke=\"#625492\" stroke-width=\"2.2\"/><circle cx=\"12\" cy=\"6\" r=\"3.7\" fill=\"#625492\"/></svg><span>Lancome TIU #PO_01_Anker 4.15</span><b>2.3</b><span class=\"ds-d\">+1.0</span><svg width=\"24\" height=\"12\" viewBox=\"0 0 24 12\" aria-hidden=\"true\"><path d=\"M0 6h24\" stroke=\"#8E85A2\" stroke-width=\"1.5\" stroke-dasharray=\"5 4\"/><circle cx=\"12\" cy=\"6\" r=\"3.3\" fill=\"#fff\" stroke=\"#8E85A2\" stroke-width=\"1.5\"/></svg><span>NARS #L2</span><b>1.3</b><span class=\"ds-d\"></span></div><div class=\"ds-tip-verdict\">Worse <small>threshold 0.6</small></div></div>",
+      "css": ":host{--paper:#F5F3F7;--surface:#FCFBFD;--white:#FFFFFF;--edge:#E6E3EB;--hair:#DCD9E0;--ink:#2A2537;--ink-2:#6B5E82;--a:#625492;--b:#61829E;--better:#74936C;--worse:#B15D59;--a-wash:rgba(98,84,146,.10);--b-wash:rgba(97,130,158,.12);--tint:rgba(42,37,55,.045);--glass:rgba(47,41,61,.035);--glass-filter:blur(14px) saturate(1.2) brightness(1.07);--glass-drop:0 10px 28px rgba(42,37,55,.13),0 1px 2px rgba(42,37,55,.06),inset 0 1px 0 rgba(255,255,255,.65);--lift:0 8px 22px rgba(42,37,55,.10),0 1px 2px rgba(42,37,55,.06);--serif:'Libre Bodoni',Georgia,serif;--sans:'Red Hat Text','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);} .ds-vellum{display:inline-block;min-width:260px;padding:14px 18px 15px;border-radius:12px;background:var(--glass);box-shadow:var(--glass-drop);-webkit-backdrop-filter:var(--glass-filter);backdrop-filter:var(--glass-filter);font-family:var(--sans);color:var(--ink);font-variant-numeric:lining-nums tabular-nums;transition:opacity .18s var(--ease),transform .18s var(--ease);} .ds-vellum:hover{transform:translateY(-1px);} .ds-tip-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;} .ds-caps{text-transform:uppercase;letter-spacing:.075em;font-weight:500;font-size:14.5px;} .ds-tip-time{font-size:15px;color:var(--ink-2);} .ds-tip-rows{display:grid;grid-template-columns:24px 1fr auto auto;column-gap:10px;row-gap:6px;align-items:center;font-size:15.5px;} .ds-tip-rows b{font-weight:500;text-align:right;} .ds-d{color:var(--ink-2);text-align:right;min-width:3.2em;} .ds-tip-verdict{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(42,37,55,.12);font:400 18px var(--serif);} .ds-tip-verdict small{font:400 14.5px var(--sans);color:var(--ink-2);}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Editorial, Morandi, and rich (v2 §1)",
+    "overview": "A vertical sensory profile drawn straight on lilac paper against a dashed, hollow baseline: a point beyond its attribute's threshold gets a halo that says better or worse, and the tooltip states the threshold. The controls are one editorial sentence that is at once selector, chart title and legend. Structure comes from hairlines, surface contrast and whitespace; only floating things get a surface, and things that follow the pointer are smoked-vellum glass.",
+    "keyCharacteristics": [
+      "Lilac paper, ink, one brand violet and one slate; sage / clay only as halos",
+      "Libre Bodoni 400 untracked for voice; Red Hat Text tabular for codes and data",
+      "Capsules for anything chosen, dashed borders for anything empty",
+      "Opaque standing surfaces, temporary vellum glass",
+      "One easing curve; lines flow rather than redraw"
+    ],
+    "rules": [
+      {
+        "name": "The Halo Carries the Verdict Rule",
+        "body": "Sage and clay red never colour a line, a pill or text; they appear only as halos, the list-head dots and the verdict underline. The line keeps its series colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Uncoloured Baseline Rule",
+        "body": "The baseline is grey-violet, dashed and hollow; it never takes a series colour or the verdict pair.",
+        "section": "colors"
+      },
+      {
+        "name": "The Untracked Didone Rule",
+        "body": "Libre Bodoni is always `letter-spacing: 0`, with common and contextual ligatures on and proportional numerals.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Sans Rule",
+        "body": "Red Hat Text always runs lining tabular figures, so columns of readings align without a table.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glass Is Temporary Rule",
+        "body": "Vellum only on what appears under the pointer and leaves; anything that stands on the page is opaque.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep every new colour inside the palette above; washes are the series colours at 10–12% and hover grounds are ink at 4.5%.",
+      "**Do** draw arrows, chevrons and marks as SVG strokes; both families ship Latin only.",
+      "**Do** use capsules for anything pressed or chosen and dashed borders for anything empty.",
+      "**Do** move with the one curve and the fast / state / flow durations.",
+      "**Do** give halos, not lines, the verdict colours, and spell *Better* / *Worse* out beside them."
+    ],
+    "donts": [
+      "**Don't** track Libre Bodoni or set it in a weight other than 400.",
+      "**Don't** put a card behind a region; structure comes from hairlines, surface contrast and space.",
+      "**Don't** use vellum glass for anything that stays on the page, or an opaque surface for anything that follows the pointer.",
+      "**Don't** set text in uppercase except the eight attribute names.",
+      "**Don't** break the lines between time blocks (§16)."
+    ]
+  }
+}

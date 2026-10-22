@@ -1,51 +1,48 @@
-# Foundation Affinity × AI-lization — Dashboard Design Spec
+# Foundation Affinity × AI-lization — Design Spec v2
 
-Demo dashboard for the Foundation Affinity project: a DINOv3-based model that scores foundation wear from images, compared against sensory panel scores. Single-screen (1920 × 1050), no scroll. Audience: non-data stakeholders. Goal: in under a minute, convey "the AI agrees with the panel" and "this is worth investing in."
+A toolbox for pulling and comparing AI sensory readings of foundation. A DINOv2-based model reads Optiscreen photographs and scores the eight sensory attributes; the human panel is no longer part of the picture. Users import a formula's AI readings, then either track one formula across wear time (**Dynamic**) or compare formulas against a benchmark (**Comparison**).
 
-Status: v1 spec, 2026-09-18. Items marked **[TBD]** are open and non-blocking.
+Status: v2, 2026-10-22. Supersedes v1 entirely (archived by the author). This document sets direction — layout, visual system, interaction logic. Exact sizes, timings and copy are implementation choices. Items marked **[TBD]** are open.
+
+**Two purposes, held at once.** On the surface it is a working tool for the sensory team and must read as one: real controls, real data flow, real export. Underneath, it is a demo for leadership and must impress on sight. Whatever would need a backend (upload parsing, model card, record metadata) is faked convincingly; whatever can be real in the browser (selection, significance, export) is real.
 
 ---
 
 ## 1. Principles
 
-- **One story, one screen.** Stat tiles state the value; the line chart is the evidence; the right panel is the close-up. Nothing else.
-- **Positive framing.** Every element shows *agreement*, never *error*. No red, no warning states. Residuals are shown as "AI dot inside the panel ring" (a hit), not as a distance bar.
-- **Color only for products.** Everything else (AI vs panel, hierarchy, emphasis) is encoded by line style, weight, and opacity. Max three products on screen → max three hues.
-- **Quiet, editorial, luxury.** Light paper background, high-contrast Didone display type, generous whitespace, hairlines. Restraint over decoration. Motion is the richness: lines flow, controls glide.
-- **Whitespace is intentional.** The chart is allowed to breathe. Density comes from within the chart (gridlines, value labels, fill band), not from adding components.
+- **A tool, not a pitch.** The screen answers working questions — *how does this formula wear?*, *how does it compare to that one?* No accuracy claims beyond one quiet model badge.
+- **Fool-proof by structure.** The viewer is assumed to know nothing. Rules are expressed by the shape of the controls (a bench slot that cannot be emptied, a sentence that is always grammatical), never by help text.
+- **One mode, one chart.** Dynamic and Comparison are separate modes behind one switch; their charts never share the screen.
+- **The sensory team's orientation.** Profiles are drawn vertically, as the team draws them: scale across the top, attributes down the right.
+- **Colour means something.** Line colour identifies a series; a separate colour pair marks significant differences (better / worse). The baseline series carries no colour.
+- **Editorial, Morandi, and rich.** Fashion-editorial luxury: lilac paper, Didone display type, hairlines, generous space. Restraint is not the goal — motion, ornament and considered detail are wanted wherever they make the page more refined. Under-designed is as much a failure as AI slop.
+- **No unnecessary containers.** Cards are not a default. Structure comes from hairlines, surface contrast and whitespace. Only floating things (menus, pointer-following overlays) get a surface of their own.
 
 ---
 
 ## 2. Canvas & Layout
 
-Fixed 1920 × 1050. Outer margin **76px left/right, 52px top, 64px bottom** — deeper at the foot so the page sits rather than floats. Column gap **56px**. Internal spacing follows a 4-unit scale (4 / 8 / 12 / 16 / 24 / 32 / 44 / 56 / 72), tight inside a group and generous between groups; font sizes and radii are left to implementation.
+One fixed **1920 × 1050** canvas, no page scroll, scaled to fit whatever screen it lands on.
 
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│ TOP BAR  (h 72)   Title / subtitle                   Overlay|Split|Radar│
-├────────────────────────────────────────────────────────────────────────┤
-│ TILE ROW (h 84)   83% Acceptance rate │ 53 Formulas… │ ~70% Time saved │
-├──────────┬──────────────────────────────────────────┬──────────────────┤
-│ LEFT     │ CENTER                                   │ RIGHT            │
-│ w 288    │ flexible (~1012)                         │ w 420            │
-│          │                                          │                  │
-│ Formula  │ Chart header: title · legend (draggable) │ Bottle + name    │
-│ search   │                                          │                  │
-│ Chips ×3 │ Main chart                               │ Agreement        │
-│          │ (line / split / radar)                   │ profile ×8 rows  │
-│ Time     │                                          │                  │
-│ control  │                                          │                  │
-│          │                                          │ Acceptance · Diff│
-│ Attribute│                                          │                  │
-│ list ×8  │                                          │                  │
-└──────────┴──────────────────────────────────────────┴──────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│ TOP BAR   Title / subtitle               [ Dynamic | Comparison ]  Model │
+├─────────────┬────────────────────────────────────────────────────────────┤
+│ LIBRARY     │ SENTENCE   Compare [ A ▾ ] and [ + ] against [ Bench ▾ ]   │
+│             ├─────────────────────────────┬──────────────────────────────┤
+│ Search      │ CHART                       │ FINDINGS                     │
+│ Import zone │ scale 0–6 across the top    │ Verdict sentence             │
+│ Uploaded    │ attributes down the right   │ Tally                        │
+│ History     │                             │ Better / Worse lists         │
+│  (scrolls)  │ (Dynamic: shorter chart,    │ ─────────────                │
+│             │  Formula record beneath)    │ Library position (strips)    │
+└─────────────┴─────────────────────────────┴──────────────────────────────┘
 ```
 
-Heights: top bar 72, tile row 84, row gap 32, work area = remainder (**714**). Right column 420 (adjust if the agreement profile needs more; not hard-coded). Left column 288.
-
-The centre column carries, top to bottom: chart header, the plot at a fixed **496px** — deliberately wide and shallow, because the data is one high attribute and seven low ones, so a tall plot pushes the whole picture into the bottom of the screen — then whitespace, then the closing line (§7.5) anchored to the foot.
-
-Containers: the right panel is a card on a surface color with a 1px edge — **no drop shadow**; separation comes from the edge and the surface/paper contrast alone. The **tile row is not carded** — three numbers printed directly on the paper, separated by vertical hairlines (editorial, not dashboard); nothing materializes beneath a tile on hover (see §5.2). The center chart sits directly on the paper, no card, so the lines feel like they're drawn on the page. Left column is uncarded as well; its groups are separated by hairlines and section labels.
+- Three columns: a narrow **library** on the left; the **chart** and the **findings** sharing the rest roughly equally. Full-height hairlines between columns.
+- The **sentence** spans the chart and findings columns — it is the title of everything beneath it.
+- Both modes use the **same chart width**. Comparison's chart fills the full height; Dynamic's is shorter, with the **Formula record** (§10) beneath it.
+- The library list is the only region that scrolls, internally. The page never scrolls.
 
 ---
 
@@ -55,321 +52,514 @@ Containers: the right panel is a card on a surface color with a 1px edge — **n
 
 | Role | Hex | Notes |
 |---|---|---|
-| Paper (page bg) | `#F5F3F7` | warm lilac-grey white |
-| Surface (cards) | `#FCFBFD` | one step lighter than paper |
-| Card edge | `#E6E3EB` | 1px |
-| Ink (primary text) | `#2A2634` | purple-grey black, ~13:1 on paper |
-| Ink 2 (secondary text, axis labels) | `#6E6878` | ~4.9:1 |
-| Hairline (grid, dividers) | `#DCD9E0` | ≈ ink @ 12% on paper |
-| Product 1 — violet | `#625492` | primary; deeper than the paper so the main series reads first |
-| Product 2 — slate | `#61869E` | cooler neighbor |
-| Product 3 — rose | `#A66E79` | warmer neighbor |
+| Paper | `#F5F3F7` | page ground, warm lilac-grey |
+| Surface | `#FCFBFD` | menus, pills |
+| Corridor | `#FFFFFF` | the significance corridor only (§8.4) |
+| Edge / Hairline | `#E6E3EB` / `#DCD9E0` | 1px structure |
+| Ink / Ink 2 | `#2A2537` / `#6B5E82` | text; ink is also the **baseline series** |
+| Series A — violet | `#625492` | first compared series (brand purple) |
+| Series B — slate | `#61829E` | second compared series |
+| Sig better — sage | `#74936C` | Morandi green |
+| Sig worse — clay red | `#B15D59` | Morandi red |
 
-Product colors are assigned by **selection order** (1st selected = lavender, 2nd = slate, 3rd = rose), and swap when the user reorders products (see §6.3).
-
-Fill band (AI ↔ panel area of the main product): product color at 8% opacity.
-Comparator products: entire line group at ~45% opacity.
-Hover/selection background tint: ink at ~4%.
-Never use color to mark "ours" vs "market" — see §6.1.
+- Brand purple is the page's identity: Series A, the mode switch, the *Uploaded* wash, ornament.
+- Better / worse is never carried by colour alone — tooltips and lists always spell out *Better* / *Worse* and the signed difference.
 
 ### 3.2 Typography
 
-- **Display / serif:** Libre Bodoni, **weight 400 everywhere** (the family's lightest weight). Didone, matching beauty-industry vernacular; chosen over Bodoni Moda for sturdier hairlines on Windows + projector. Hierarchy comes from size, not weight. Used for: page title, tile numbers, product names (everywhere they appear: list, chips, legend, right panel), the right-panel acceptance-rate number.
-- **Data / sans:** Red Hat Text, 300–400, `font-variant-numeric: tabular-nums`. Chosen for its open, generous letterforms and small-size legibility (replaces Inter as too generic). Used for: all numbers in charts and tooltips, axis labels, attribute names, section labels, UI controls (casing per the rule below).
-- **Casing rule:** uppercase + letter-spacing is reserved for the **8 attribute names** (COVERAGE, POWDERY, …) — that is how the sensory lexicon is written, so it carries meaning. Every other label (section labels "Formula" / "Time" / "Attributes", tile labels, tags, buttons, tooltip labels) is **sentence case**. Exceptions: the time points T0 / T3 / T6, and the tags "Our formula" / "Market" which stay sentence case.
-- **No tracking on the display face.** Chrome and Safari silently drop ligatures from any text run with a non-zero `letter-spacing`, which breaks `ffi` in *Affinity*. Libre Bodoni is therefore never letter-spaced; it carries `font-variant-ligatures: common-ligatures contextual` and `font-variant-numeric: normal` (it has no `tnum`, and tabular figures are a Red Hat Text rule that must not inherit into it). Optical spacing on display type goes into the words, not between the letters.
-- **Platform constraint:** the demo runs on a Windows ThinkPad, possibly offline. Only OFL fonts. The `.woff2` files are **embedded in `index.html` as data URIs** (`scripts/fetch-fonts.mjs` downloads, `scripts/embed-fonts.mjs` inlines): `file://` blocks `@font-face` files loaded from a subdirectory, so a linked stylesheet silently falls back to Georgia. No system-only fonts (e.g. Bodoni 72), no runtime dependency on Google Fonts, nothing to lose out of the zip. `specimens/font-proof.html` verifies the embedded bytes against Google's own copy.
+- **Libre Bodoni 400**, upright and italic: title, mode labels, the sentence's connective words (italic), the verdict sentence, display numerals. Never letter-spaced (tracked runs lose their ligatures).
+- **Red Hat Text 300–500**, tabular figures: formula IDs (they are codes, not names), data, labels, controls.
+- **Uppercase + tracking only for the eight attribute names**, as the sensory lexicon writes them. Everything else is sentence case.
+- Both families ship Latin only: any glyph outside it (arrows, Δ, chevrons) is drawn, never typed.
 
-### 3.3 Depth — used exactly twice
+### 3.3 Material
 
-1. **Segmented time control thumb.** A solid surface-colored capsule with a 1px edge, sitting in a recessed track (track = ink at ~4%, no inner shadow on the thumb). Flat and modern, not glossy: no inner shadow, no top highlight, no gradient. The affordance comes from the thumb reading as a physical object in a track, plus `cursor: grab` / `grabbing`, and a slight scale-down (~0.98) while dragging.
-2. **Product image in the right panel** (§8.1): a very light drop shadow, so it sits on the page like an object.
-3. **Transient overlays — smoked vellum.** The two tooltips (chart `.tip`, stat tile `.tile-tip`) are the only glass on the page: a 3% **ink** tint over `blur(12px) saturate(1.2) brightness(1.07)`, no border, plus a soft drop (`0 6px 20px` ink @ 12%). The tint is ink rather than white on purpose — a white translucency on `#F5F3F7` has no luminance to trade on and the plate disappears over blank paper, so the plate reads a shade **darker** than the paper and keeps its edge everywhere; `brightness()` washes the chart out underneath so 12px labels stay clean. Tokens: `--glass`, `--glass-blur`, `--glass-drop`. This applies **only to overlays that follow the pointer and leave** — standing surfaces (right panel, dropdown, thumb, legend key) stay opaque paper with a 1px edge, which is what keeps the glass legible as "this is temporary."
+- **Smoked vellum** — ink-tinted frosted glass with a soft drop and a faint cut-edge highlight — for everything that follows the pointer and leaves: tooltips, hover previews, the model card. Content inside is typeset, not boxed.
+- **Standing surfaces** (menus, pills, mode switch thumb) are opaque with a 1px edge. That contrast is what makes the glass read as temporary.
+- Depth is rare: the mode switch thumb, lifted pills, floating menus.
 
-Everything else is flat: no card shadows, no gradients as decoration, no glow. Hierarchy is carried by hairlines, surface color and whitespace.
+### 3.4 Ornament
+
+- The 0–6 axis drawn as a fine **ruler** with minor ticks.
+- Large faint Didone **time-band numerals** (T0 / T3 / T6) in the Comparison chart's margin, like section numbers in a magazine.
+- The **white corridor** itself — a pale path through the lilac page.
+- **Ink-drop** fill when a pill receives a formula; a gently **breathing** empty bench slot when it is the thing blocking the chart.
+
+All ornament and motion respect `prefers-reduced-motion`.
 
 ---
 
 ## 4. Data
 
-### 4.1 Dimensions
+### 4.1 Formulas
 
-- **Formulas:** 53. Named ones: `NARS LightR`, `LANCOME TIU`, `YSL All Hours`, `DPDP Oil-control`; the rest `Product 5` … `Product 53`. `LANCOME TIU` and `YSL All Hours` are flagged `ours: true`; `NARS LightR` and all others `ours: false`. **`ours` is a presentation label, not a property of the data** — the generator must never constrain the simulated wear ranking by it, or the label and the physics contradict each other.
+- Identified by **formula ID only** (no brand-name field, no ours / market distinction):
+  - `b53176_NARS #L2`, `993472_YSL all hours LC1` — history.
+  - `Lancome TIU #PO_01_Anker 4.15` — hidden until the fake upload reveals it.
+  - `Product 0001` … `Product 0020` — placeholder history (generated mock data), standing in for the ~50 formulas to come.
+- In running text (the verdict) the ID-number prefix is dropped (`b53176_NARS #L2` → `NARS #L2`). Everywhere else the full ID is shown.
 
-> Only the three named formulas above are mocked (3 × 3 × 8 = 72 pairs). The 53 / 1,272 figures on the tiles are demo copy the sensory team will replace; this is known and accepted, not an inconsistency to "fix".
-- **Time points:** `T0`, `T3`, `T6` (hours after application).
-- **Attributes (fixed order everywhere):**
-  1. COVERAGE
-  2. REFLECTION vs. BARE
-  3. UNEVEN SKINTONE
-  4. POWDERY
-  5. CAKEY
-  6. FLAKE
-  7. IMBED INTO LINES
-  8. CLOG INTO PORES
-- **Scores:** 0.0 – 6.0, one decimal. Each cell has `panel` (mean of 15 panelists — averaging is upstream, not our concern) and `ai`.
+### 4.2 Readings and rules
 
-### 4.2 Schema (`data.js`)
-
-```js
-{
-  attributes: ["COVERAGE", "REFLECTION vs. BARE", ...],   // 8, fixed order
-  times: ["T0", "T3", "T6"],
-  formulas: [
-    {
-      id: "nars-lightr",
-      name: "NARS LightR",
-      ours: true,
-      scores: {
-        T0: [ { panel: 4.2, ai: 4.0 }, ... ],   // 8 entries, attribute order
-        T3: [ ... ],
-        T6: [ ... ]
-      }
-    },
-    ...
-  ]
-}
-```
-
-Derived metrics are computed in the front end, never stored, so swapping in real data means replacing only `data.js`.
-
-### 4.3 Metric definitions
-
-- **Tolerance:** `|ai − panel| ≤ 0.5` counts as *accepted*. **[TBD: confirm the sensory team's own Acceptance Rate definition]**
-- **Acceptance Rate (global):** accepted pairs ÷ all pairs (53 × 3 × 8 = 1272). Shown in tile 1, **to one decimal** — a whole number reads as rounded-off marketing, a decimal reads as measured. "Acceptance Rate" is the wording everywhere in the UI — never "accuracy", which reads as right/wrong.
-- **Acceptance Rate (per formula):** accepted pairs ÷ 24 for that formula (all times), shown in the right panel. Same definition, same words, so the tile and the panel are consistent.
-- **Average Difference (per formula, per selected time):** mean of `|ai − panel|` over the 8 attributes — MAE internally, but always labelled "Average Difference" in the UI, and `Diff` where the tooltip needs it short. Right panel small number.
-
-### 4.4 Mock data "story"
-
-Generate mock data so it looks physically plausible and flatters the model without lying:
-
-- T6 scores for POWDERY / CAKEY / FLAKE / IMBED / CLOG are higher than T0 (wear degrades). COVERAGE drifts down slightly.
-- `ours` formulas have slightly better affinity than the market mean.
-- AI tracks panel closely: per-cell noise such that the global Acceptance Rate lands at **83–85%**. One or two attributes (e.g. REFLECTION vs. BARE) carry a little more noise than the rest, so the profile isn't unrealistically perfect.
-- A few "showcase" formulas (the four named ones) are on the accurate end so the default view looks great.
-- Seeded RNG so the demo is reproducible.
+- Formulas × 3 time points (T0 / T3 / T6) × 8 fixed attributes, **AI score only**, 0–6 to one decimal.
+- **Significance:** `|x − base| ≥ threshold` for that attribute. Per-attribute thresholds are **mock** until the sensory team supplies them.
+- **Polarity:** COVERAGE and REFLECTION vs. BARE are better when higher; the other six are better when lower. Better / worse = the sign of the difference × polarity.
+- **Base** = the bench at the same time point (Comparison), or the baseline time of the same formula (Dynamic).
+- Everything derived is computed in the page, never stored — replacing the data files is enough to update everything.
+- The model badge's acceptance figure (83.4%) is mock copy.
 
 ---
 
-## 5. Top Bar & Stat Tiles
+## 5. Top Bar
 
-### 5.1 Top bar
-
-- Left: title **Foundation Affinity × AI-lization** (Libre Bodoni) and the subtitle `AI-model powered by DINOv3 vs. Optiscreen Panel` (Red Hat Text, secondary ink) on **one line, sharing a baseline**, parted by a hairline-coloured `/`. Stacking them cost 34px of height that the chart needed; side by side the whole identity reads as one stroke across the top.
-- Right: view toggle **Overlay | Split | Radar** (see §7.4), built as the **same capsule-in-a-recessed-track** as the time control (§3.3) — the two segmented controls on screen must read as one kind of thing — set a step larger and heavier than body text (17px / 500) because it is a control, not a caption. Radar is disabled (greyed, tooltip "single formula only") when more than one formula is selected.
-
-### 5.2 Stat tiles (3)
-
-Layout: the number and its label sit **side by side**, label to the right of the numeral, their **cap lines aligned** (not baselines). This keeps the row to 84px and hands the height to the chart. Number in Libre Bodoni 58, label 24, secondary line 16.
-
-| Tile | Value | Label | Tooltip (how it's computed) |
-|---|---|---|---|
-| 1 | **83.4%** | Acceptance rate | "Share of all 1,272 attribute scores where the AI prediction is within ±0.5 of the panel mean." Secondary line under the label: `within ±0.5 on the 0–6 scale`. |
-| 2 | **53** | Formulas covered | "Formulas evaluated, including our products and market benchmarks." **[TBD: split into ours / market counts?]** |
-| 3 | **~70%** | Time saved | "Panel test cycle vs. image inference per formula." Demo placeholder — the real basis comes from the sensory team; don't invent numbers. |
-
-Labels are sentence case (see §3.2), not uppercase.
-
-Behavior:
-- **Count-up** animation on page load (numbers roll from 0 to target, ~1.2 s, ease-out). Runs once. Kept deliberately: stakeholders read it as polish. Revisit if it starts to feel gimmicky in review.
-- **Pinned.** Tiles never change with selection. They represent the whole project; the chart represents the evidence.
-- **Hover:** no 3D tilt, no perspective transform. The tooltip / computation note fades in below the tile (~150 ms) on smoked-vellum glass (§3.3), and the tile's hairline separator darkens to ink. Nothing moves.
+- **Left:** title **Foundation Affinity × AI-lization** with subtitle *AI readings powered by DINOv2*, on one line.
+- **Right:** the **mode switch** (Dynamic | Comparison) as a capsule with a sliding thumb, and the **model badge** — quiet, *DINOv2 · 83.4% acceptance*. Hovering the badge opens a model card explaining what acceptance means; it is the only place the panel or accuracy is mentioned. Unconfirmed details are visibly marked as placeholders.
 
 ---
 
-## 6. Left Column — Selectors
+## 6. Left Column — Library
 
-Three groups top to bottom: **Formula**, **Time**, **Attributes**. Groups are separated by hairlines with sentence-case labels ("Formula", "Time", "Attributes").
+Top to bottom: **search**, **import zone**, **Uploaded**, **History**, a *Download template* link.
 
-### 6.1 Formula selector
+- **Search** filters both groups live.
+- **Uploaded** appears only after an import; its rows are tagged *New* and tinted, so imported formulas are told apart from history at a glance (same in the dropdowns). Placeholder rows are set lighter than real ones.
+- Rows already in the sentence show their series glyph. **Click** a row to place it (§7.4). Hovering a row previews its profile and highlights it in the library strips (§9.3).
 
-- **Closed state: a framed field, not a search box.** A bordered surface-coloured field reading *Select formula…* in **italic** Red Hat Text with a chevron at the right. It has to say "choose something here" before anyone touches it; a bare search line does not.
-- **Open state:** the frame disappears and becomes the search line — underline only, italic *Search formulas…* placeholder — with the list beneath it. Typing filters live (case-insensitive substring); no match shows a quiet italic line naming what was typed. Escape or a click outside closes it.
-- The list **floats over the column** on its own surface with a 1px edge and no shadow; it must not push the chips, time control and attribute list down.
-- Dropdown list has two sections: **Our formulas** (top) and **Market**, separated by a hairline and a sentence-case label. Ours always listed first. Already-selected rows are marked *selected*; when three are chosen the rest go quiet and read *max 3*.
-- **Ours vs. market glyph:** a small **filled circle** (ink color) before ours; a **hollow ring** before market. This glyph is used consistently in the list, chips, legend, and right panel header. Never color-coded.
-- Selecting adds the formula as a **chip** below the search box. Max **3** chips; when 3 are selected, further list items are disabled with a hint "max 3".
-- Chip order = product rank: 1st chip = **main** product (lavender), 2nd and 3rd = **comparators** (slate, rose). Each chip shows a color dot in its product color, the ours/market glyph, the name in Libre Bodoni, and a remove ×.
-- Chips are **drag-reorderable**; reordering is mirrored live in the chart legend and in the chart (colors, z-order, opacity swap). The legend is also draggable — same state, two entry points.
-- Removing the main chip promotes the next chip to main.
-- Hover on a list item / chip: 4% ink background tint.
+### 6.1 The fake upload
 
-### 6.2 Time control
+A dashed drop zone, *Drop AI readings (.xlsx)*. Any file, dropped anywhere on the page or picked, starts an import; its contents are never read.
 
-Segmented control **T0 | T3 | T6** with a sliding thumb (see §3.3 for the thumb's material). Track and thumb are **fully rounded capsules** (`border-radius: 999px`), not soft rectangles. The thumb must read as draggable before anyone touches it — that is what the recessed track, the solid raised thumb and the grab cursor are for; a plain underline marker would not say "you can slide this."
+The whole sequence happens **inside the zone and the list — no card or modal**: the filename appears, a counter rolls up to *24 readings* (8 attributes × 3 time points) over a hairline progress rule, then `Lancome TIU #PO_01_Anker 4.15` writes itself into a newly opened *Uploaded* group and lands in the sentence. The record (§10) shows the dropped filename as its source. Importing again does not duplicate; it points at the existing row.
 
-- **Click** on a segment: toggles selection (multi-select allowed only in single-formula mode, see §6.4).
-- **Drag** the thumb: single-select; the thumb glides between segments and the chart lines flow in real time as the thumb passes each segment. Release snaps to nearest segment.
-- In multi-select the thumb stretches to cover contiguous selected segments, or shows separate thumbs for non-contiguous ones (implementation detail; either is fine).
-
-### 6.3 Selection modes (derived, never toggled by the user)
-
-The user never picks a "mode." Whichever selector has more than one item selected **owns the legend**; the other is forced to single-select.
-
-| Formulas selected | Times selected | Legend shows | Lines on chart |
-|---|---|---|---|
-| 1 | 1 | one entry | 2 (AI + panel) |
-| 1 | 2–3 | time points | 2 × times (4 or 6) |
-| 2–3 | 1 | formulas | 2 × formulas (4 or 6) |
-| 2–3 | 2–3 | **not allowed** | — |
-
-Rules:
-- Selecting a 2nd formula while 2+ times are selected collapses time to the **most recently selected** time (thumb animates to it).
-- Selecting a 2nd time while 2+ formulas are selected: not possible — the time control is in single-select mode (click behaves as a radio). A small hint appears on hover: "Deselect formulas to compare times."
-- The selector that owns the legend shows a color dot on each selected item matching its line color. Time-mode colors reuse the same three product colors in order (T0 → lavender, T3 → slate, T6 → rose) — the palette is "up to three series," whatever the series are.
-
-### 6.4 Attribute list (hover preview)
-
-Eight rows, fixed order, Red Hat Text uppercase + letter-spacing (the one place uppercase is used, §3.2). Not a filter — the chart always shows all 8 attributes.
-
-- **Hover** on a row: in the chart, all other attributes' points and line segments drop to ~30% opacity, and a soft vertical band (ink at ~4%) appears at that attribute's x-position. Right-panel row for the same attribute also highlights. Sweeping the mouse down the list produces a "scanning" effect — designed for live presentation.
-- Mouse leave: everything restores with a short ease.
-- Click: no action in v1 **[TBD: could pin the highlight]**.
+The template link is a real download of an empty readings template.
 
 ---
 
-## 7. Center — Chart
+## 7. The Sentence — the Control
 
-### 7.1 Chart header
+The sentence is the selector, the chart title and the legend at once. Connective words in Bodoni italic; slots are pills holding formula IDs, coloured like their lines.
 
-- Left: chart title in Libre Bodoni (e.g. the main formula name, or "T0 · T3 · T6" in time mode) and a secondary line with the current time point / formula count.
-- Right: **legend**, in **two rows of fixed height**. Row 1 holds the main series and nothing else; row 2 holds the comparators side by side, and stays empty when only one formula is selected. The block therefore keeps its height whether one series is shown or three, so **the chart never changes size or position when the selection changes** — a chart that shrinks each time a comparator is added reads as unstable, and the eye notices the jump more than the new line. Entry = series swatch + ours/market glyph (formula mode only) + name in Libre Bodoni; comparator names are set one step smaller. Legend entries are **drag-reorderable** (same state as chips, §6.1).
-- **Line-style key** (`—— AI` / `‐ ‐ Panel`): drawn **inside the plot, upper right**, not in the header. Coverage runs high at the left of every formula, so the right shoulder is the emptiest corner of a 0–6 chart. It is a paper-filled box with a 1px hairline edge — it **masks the gridlines it sits on**, which is correct: it is a caption on the drawing, not part of it. Set in ink at 17px, not secondary grey at 14px; it has to be readable from the back of a room. It costs no layout height, which is what keeps the header fixed (above). A later refinement could label the two lines directly at their ends instead; at T0 the series converge to within 0.2 at the right edge, so those labels would collide today.
+### 7.1 Comparison
 
-### 7.2 Line chart (Overlay view, default)
+> *Compare* [ A ▾ ] *and* [ B ▾ ] *against* [ Bench ▾ ]
 
-- x-axis: 8 attributes in fixed order, labels in Red Hat Text uppercase with letter-spacing, spread across the full width. Labels are horizontal; if width requires, break "REFLECTION vs. BARE" onto two lines rather than rotating.
-- y-axis: 0–6, hairline gridlines at every 1.0, labels in secondary ink. No axis line, no tick marks — only gridlines and labels.
-- Per series (formula or time) two lines. **The main series is drawn heavier than its comparators**, so rank reads off the line weight itself and not only off opacity:
-  - **AI:** solid — main ~2.4px, comparators ~1.4px — filled circle markers (r 4.2 / 3.2).
-  - **Panel:** dashed — main ~1.6px, comparators ~1px — hollow circle markers (r 4 / 3).
-- **Main series** (rank 1): 100% opacity, drawn on top, plus the **fill band** between its AI and panel lines at 8% product color. Main series' AI points carry small value labels (Red Hat Text, secondary ink). The band is the visual "gap"; the tighter it is, the better the model looks.
-- **Comparators** (rank 2–3): ~45% opacity, no fill band, no value labels, drawn beneath.
-- Lines use a gentle curve (monotone cubic, Fritsch–Carlson) — not sharp polylines, not over-smoothed, and never overshooting a data point.
-- Value labels carry a paper-coloured stroke behind them (`paint-order: stroke`) so they stay legible where the lines crowd.
+- **Bench:** white (the corridor's colour) with an ink edge and a *Bench* caption. It has no remove button — it can only be replaced or swapped. This is how "always exactly one bench" is taught without words.
+- **A / B:** tinted with their series colour, removable. B appears only once A is filled; removing A promotes B.
+- **Empty slots** are dashed *+ Add formula* / *+ Choose bench*, so the sentence is always grammatical.
+- **Make bench (⇄)** on an A or B pill swaps it with the bench.
+- Up to three formulas in total: one bench plus at most two compared.
 
-### 7.5 Closing line
+### 7.2 Dynamic
 
-One sentence in Libre Bodoni sits below the plot, separated by a hairline and anchored to the foot of the centre column:
+> *Track* [ Formula ▾ ] *over* [T0] [T3] [T6]
 
-> Across eight attributes, the model never parts from the panel by more than 0.6 of a point.
+- One formula; three time toggles, all on by default; at least one always stays on.
+- The **earliest selected time is the baseline** and is styled like the bench; later times take the series colours in order.
 
-It is **computed from the data**, not written into the markup, so it stays true when the data is replaced. It gives the foot of the page something to land on and hands a time-poor viewer one sentence they can carry out of the room. It describes the chart above it — the main formula at the selected time — never the whole project.
+### 7.3 Dropdowns
 
-### 7.3 Interactions
+Each pill opens a floating menu with search and the same *Uploaded* / *History* sections. Choosing a formula that already sits in another slot **swaps** the two rather than duplicating.
 
-**Point hover** (the main product's marks only): the target is the **mark, not the column** — within ~15px of the main product's AI or panel point at an attribute. Crossing the plot at any other height triggers nothing, so the highlight reads as an answer to a gesture rather than something that follows the cursor around. Both the AI and panel points at that attribute enlarge/highlight, and a tooltip appears:
+### 7.4 Placement rules
 
-```
-NARS LightR · T3          (serif name, small time tag)
-COVERAGE
-AI      4.2
-Panel   4.0
-Diff    +0.2
-Match.
-```
-The third row is labelled **`Diff`**, never `Δ`: neither Libre Bodoni nor Red Hat Text carries a Greek delta (Google ships latin / latin-ext only), so `Δ` would fall back to a system font — one stray glyph in the wrong typeface, most visibly on the Windows machine this is presented from.
-
-Tooltip on smoked-vellum glass (§3.3), ink text, Red Hat Text tabular numbers. The closing line reads **"Match."** and appears only when the pair is accepted (no negative wording when not — just omit the line).
-
-**Line hover on a comparator:** only the hovered line (e.g. the panel line of product 2) rises to 100% opacity and gains ~0.5px weight. Its sibling line (the AI line of the same product) stays as-is. Leave restores. It lifts **that line and nothing else** — no attribute band, no tooltip: those belong to the main product's marks, and a comparator line must not speak for them. One exception: a main-product mark passing under the line's 16px hit stroke wins, because the stroke would otherwise swallow the point it crosses.
-
-**Click on a comparator line:** that product **swaps rank with the main product** — colors, z-order, opacity, fill band, value labels, legend order, and chip order all swap together, animated (~500 ms). This is the same operation as dragging the chip/legend entry to position 1.
-
-**Series transition ("flow"):** whenever the selection changes (formula swap, time change, rank swap, thumb drag), lines animate from their old y-positions to the new ones (~600 ms, ease-in-out) rather than redrawing. Added series fade in along their path; removed series fade out. The fill band morphs with the lines.
-
-**Attribute hover** (from left list, §6.4): dims other attributes, shows vertical band.
-
-**Empty state:** if no formula is selected, chart shows the axes and gridlines only with a centered secondary-ink hint "Select a formula." On load, default selection = `NARS LightR`, `T0`.
-
-### 7.4 View toggle: Overlay | Split | Radar
-
-- **Overlay** (default): everything above in one chart.
-- **Split:** the chart area divides into 1–3 side-by-side panes (one per series), shared y-axis, each pane showing that series' AI + panel lines plus its own fill band (every series gets the band in split, since there's no overlap). The transition **animates**: lines travel from their overlaid positions into their own pane. Attribute labels in split may need abbreviation **[TBD: abbreviations, e.g. COVER / REFL / UNEVEN / POWD / CAKEY / FLAKE / LINES / PORES]**. Single-series Split is identical to Overlay.
-- **Radar:** 8-axis spider plot, one polygon for AI (solid, 8% fill) and one for panel (dashed, no fill), main product only. Radial scale 0–6. **v1: single formula only**; disabled with tooltip when 2+ formulas selected. Multi-formula radar (as small multiples) is a later iteration. Transition from line to radar: fade/cross-dissolve is acceptable; a true morph is optional.
-
-Hover/tooltip behavior in Split and Radar mirrors Overlay where applicable.
-
----
-
-## 8. Right Column — Formula Panel
-
-Always describes the **main** series (rank 1). In time mode it describes the main formula at the highlighted time (rank-1 time).
-
-### 8.1 Header
-
-- **Product image slot.** In the demo this is a generic bottle silhouette (original SVG, not brand packaging), tinted in the product color, with a light drop shadow. It is a **placeholder**: the sensory team will drop in real product photography, which is faster to recognise than a name. Build it as a fixed-size image slot (one `<img>` / SVG swap per formula id) so replacing art means replacing files, not layout.
-- Formula name in Libre Bodoni, ours/market glyph, tag "Our formula" / "Market" (sentence case).
-- Current time point tag.
-
-### 8.2 Agreement profile (8 rows)
-
-One row per attribute, fixed order, aligned with the chart's x-axis order.
-
-Each row: attribute label (Red Hat Text uppercase) · a hairline track representing the 0–6 scale · **panel score as a hollow ring**, **AI score as a filled dot**, both positioned on the track by value · two small numbers at the right (`AI / panel`, tabular).
-
-- When `|Δ| ≤ tolerance`, the dot sits inside the ring — a **hit**. The row reads as a bullseye. Numbers in ink.
-- When outside tolerance, dot and ring are visibly separated. Numbers in secondary ink. **No red, no icon, no warning.**
-- Dot uses the main product color; ring uses ink at reduced opacity.
-- **Comparators** (when present): their AI scores appear as small dots in their own colors at ~40% opacity on the same tracks — dots only, no rings — so cross-product agreement can be read without switching.
-- Rows respond to attribute hover from the left list (highlight) and from chart point hover.
-- Dots/rings animate along the track when selection changes (same easing as the chart).
-
-### 8.3 Summary numbers
-
-- **Acceptance rate** (per formula, §4.3) as a large Libre Bodoni number **to one decimal**, e.g. `87.5%`, with the label "Acceptance rate", a secondary line "within ±0.5 of the panel" and a small `21 / 24`.
-- **Average difference** as a small Red Hat Text number for the current time point (MAE internally — never shown as "MAE").
-
----
-
-## 9. Motion Summary
-
-| Trigger | Motion | Duration |
+| Event | Comparison | Dynamic |
 |---|---|---|
-| Page load | Tiles count up; chart lines draw in (stroke-dashoffset) | ~1.2 s |
-| Selection change | Lines flow to new positions; band morphs; panel dots slide | ~600 ms ease-in-out |
-| Thumb drag | Lines follow thumb continuously | real-time |
-| Rank swap (click/drag) | Color, opacity, z-order, band, legend/chip order all cross-fade/reorder together | ~500 ms |
-| Overlay → Split | Lines travel into panes | ~700 ms |
-| Attribute hover | Dim + vertical band | ~150 ms in, ~250 ms out |
-| Tile hover | Tooltip fades in below the tile; hairline separator darkens. **Nothing moves** (§5.2) | ~150 ms |
-| Line/point hover | Opacity/weight lift; tooltip | ~120 ms |
+| Library click | Fills the **bench** if empty, else A, else B. When all three are taken, nothing is replaced: the pills nudge and a hint asks to remove one. | Replaces the formula. |
+| Upload | The new formula goes into **A** (the old A moves to B). The bench is untouched — the new formula is what gets judged against a known one. | Becomes the formula. |
 
-Easing: prefer a single custom cubic-bezier used everywhere for consistency. Respect `prefers-reduced-motion` (skip flow animations, keep state changes instant).
+- Each mode keeps its own selection. An upload also fills Dynamic's slot if it is empty, so switching modes after the demo upload is never blank.
+- A newly filled pill flashes (ink-drop), so the eye catches where the formula landed.
 
----
+### 7.5 First load and the demo path
 
-## 10. Implementation Notes
+Everything starts empty: *Compare [+ Add formula] against [+ Choose bench]*, the chart a pale skeleton with one hint, the findings a quiet prompt. A chart hint appears only while the chart is empty; once anything is drawn, the breathing bench slot and the findings do the asking.
 
-- Single self-contained `index.html` (inline CSS + JS, fonts embedded as data URIs) plus `data-core.js` and one `data-<formula>.js` per formula (mock data on `window.AFFINITY_DATA`, swappable). Ship as a zip; opens by double-click on Windows.
-- Scripts (all plain Node, no dependencies):
-  - `scripts/generate-data.mjs` — seeded mock data + printed verification. Seed 13488. Hand-tuned cells live in its `OVERRIDES` table so a re-run reproduces the approved data byte for byte instead of reverting it.
-  - `scripts/fetch-fonts.mjs` — downloads the woff2 subsets and records each one's real `unicode-range` in `fonts/manifest.json`. Google writes the subset name in a comment **before** its `@font-face` block; pairing them wrong ships the wrong subset under the right filename, which renders as a plausible but wrong face.
-  - `scripts/embed-fonts.mjs` — inlines those files into `index.html`, reading ranges from the manifest and failing loudly if a file's size disagrees with it.
-  - `scripts/make-font-proof.mjs` — builds `specimens/font-proof.html` from the bytes actually embedded in `index.html`, against Google's live copy.
-- Charts drawn with SVG (D3 or hand-rolled) — needed for path morphing, per-point hover, and the fill band. Canvas not required at this size.
-- Fixed 1920 × 1050 canvas; scale-to-fit the viewport with `transform: scale()` on a wrapper so it demos cleanly on any projector without reflow.
-- No external chart-template libraries (license). Visual references (hairline, countable-unit, editorial whitespace) are reproduced in spirit only.
-- Tooltips and hint texts in English.
+**Demo path:** drop any file → Lancome lands in A and the bench slot breathes → click `b53176_NARS #L2` → the corridor unrolls, both lines draw, and the differences light up.
 
 ---
 
-## 11. Iteration Plan
+## 8. Centre — Chart
 
-1. ~~**Static skeleton**~~ — **done.** Layout, tiles, left column, line chart with main + one comparator, right panel, closing line; the formula picker is live (open / search / select / remove, max 3) and redraws everything. Fonts embedded and verified. Remaining from this round: the bottle silhouette is a rough placeholder, and the tooltip label is settled as `Diff` (§7.3).
-2. **Core interactions** — formula/time selection with mode rules, flow transitions, point/line hover + tooltip, rank swap via click/drag, attribute hover preview, tile count-up + tilt.
-3. **Views** — Split with animated transition; Radar (single formula).
-4. **Polish** — thumb skeuomorphism, bottle silhouette, reduced-motion, edge cases (max-3 hint, empty state).
+### 8.1 Shared anatomy
+
+- **Vertical profile:** score 0–6 across the top (the ruler), attributes top to bottom in fixed order, **labels on the right**.
+- Each attribute label carries a drawn **polarity arrow pointing to the better end of the scale** (→ higher is better, ← lower is better), so better / worse is defined on the page itself.
+- Lines are gentle monotone curves that never overshoot a reading. **No value labels on lines** — numbers live in the tooltip.
+- **Baseline series** (bench / baseline time): thin ink line, hollow markers. **Compared series:** series colour, slightly heavier, filled markers.
+- Above the chart: a short caption, the *Sig only* toggle and the export actions.
+
+### 8.2 Comparison
+
+- **24 rows:** T0's eight attributes, then T3's, then T6's, separated into three blocks by a rule and a gap.
+- **Lines break between blocks** — CLOG at T0 does not connect to COVERAGE at T3.
+- Bench + up to two compared series.
+
+### 8.3 Dynamic
+
+- **8 rows**, with roughly twice Comparison's row height so the two charts keep a related shape.
+- One line per selected time; each later time is judged against the baseline time.
+
+### 8.4 The corridor
+
+- Around the baseline runs a **white corridor**, extending **± each attribute's threshold**, so its width changes row to row and the thresholds can be read off the drawing.
+- Pure white with **feathered edges**, beneath all lines, following the baseline's curve; it breaks between blocks like the lines.
+- Reading rule, stated in the chart's key: *a point outside the white band is a significant difference.*
+- Only the baseline has a corridor; every compared series is judged against it.
+
+### 8.5 Significance
+
+- A significant point gets a **soft halo** behind its marker — sage for better, clay red for worse. The line keeps its series colour; the halo carries the verdict.
+- Non-significant points stay plain.
+- A small key (within threshold / better / worse) sits in the plot's emptiest corner once there is something to compare.
+
+### 8.6 Hover
+
+- The target is the **mark**, not the row. Hovering lifts the point and its counterpart on the baseline, links them, and opens a vellum tooltip with every series' reading for that attribute and time, the difference against the base, and the verdict with its threshold.
+- A hover also highlights the matching finding and library strip (§11).
+
+### 8.7 Sig only
+
+A toggle that veils every row without a significant point, leaving only the differences at full strength. A presenter control for the dense 24-row chart.
+
+### 8.8 Export (real)
+
+- **Export PNG** and **Copy image** produce a slide-ready image: the sentence as its title, a series legend, the chart with its key, a small footer. It uses the page's own fonts.
+- If the clipboard is blocked (corporate policy, `file://`), Copy falls back to a download and says so.
+- Must be verified on the Windows ThinkPad.
 
 ---
 
-## 12. Open Items [TBD]
+## 9. Right Column — Findings
 
-- Tolerance value and the exact Acceptance Rate definition from the sensory team.
-- Subtitle text under the title.
-- Tile 3 "Time saved" basis (X days vs. Y minutes).
-- Whether tile 2 should split ours / market counts.
-- Attribute abbreviations for Split view.
-- Whether attribute-row click should pin the highlight.
-- Optional: a 30px sparkline in the chart header showing the main formula's acceptance rate across T0 → T3 → T6, if the header feels empty after step 1.
+Uncarded; sections separated by hairlines. Two questions answered: *how different?* (verdict, tally, lists) and *where does it stand overall?* (library position).
+
+### 9.1 Verdict
+
+One Bodoni sentence generated from the data:
+
+- **Comparison:** about A against the bench — its most significant better and worse difference (largest relative to threshold).
+  *Lancome TIU #PO_01_Anker 4.15 covers more than NARS #L2 by T3, but turns more powdery by T6.*
+- **Dynamic:** the most significant changes across all later times against the baseline.
+- Variants for only-better, only-worse and no difference. Attribute phrasing comes from a phrase table — **[TBD wording with the sensory team]**.
+- Before there is anything to compare, this area holds a quiet prompt for the next step.
+
+### 9.2 Tally and lists
+
+- **Tally:** one line per compared series — *n better · n worse · n on par* in Didone numerals.
+- **Better / Worse lists** side by side: attribute, time, signed difference, series glyph; sorted by significance, capped with *+n more*.
+- Hovering an item lifts the matching point on the chart; clicking pulses it. Built for narration: *"look here."*
+
+### 9.3 Library position
+
+*Where they sit in the library* — eight horizontal strips (one per attribute) on the same 0–6 scale, at a chosen time point (default T6, where wear separates formulas most).
+
+- Every library formula is a faint dot; the bench is a ring; A and B are dots in their series colours.
+- **Dynamic** (*How it moves in the library*): the formula's positions at T0, T3 and T6 on each strip, joined by a thin line, coloured as in the chart.
+- Hovering a strip gives each selected formula's rank in the library for that attribute (best first) and lights up the matching chart row.
+
+This is information the chart cannot show — and it grows more useful as the library fills, which is itself the case for importing the remaining formulas.
+
+---
+
+## 10. Formula Record (Dynamic only)
+
+Beneath the Dynamic chart, an editorial colophon rather than a card: the formula ID in Bodoni, then source file, import date, readings, image count, model — placeholders visibly marked — and the actions **Export readings (.csv)** (real) and **Export PNG**.
+
+---
+
+## 11. Linking
+
+One highlight state shared by the chart, the findings lists, the library strips and the library list. Hovering any one of them lights up the same attribute / point in the others; leaving restores everything. The screen reads as one connected instrument rather than three panels.
+
+---
+
+## 12. Motion
+
+One easing curve everywhere. Motion is the richness of the page; these are the signature moments:
+
+- **Page load:** the regions arrive composed, in a short stagger.
+- **First comparison:** the corridor unrolls top to bottom, the lines draw down it, halos bloom in reading order, then the verdict and the counting tally arrive. This is the climax of the demo.
+- **Selection changes:** lines and corridor *flow* to their new positions rather than redraw; new series draw in along their path; removed ones fade.
+- **Upload:** the counter rolls, the ID types itself into the library, the pill ink-drops, the line draws.
+- **Mode switch:** the thumb glides and the chart re-forms; ideally the sentence re-types its connective words.
+- **⇄ swap:** ideally the two pills physically trade places while the corridor moves to the new bench.
+
+`prefers-reduced-motion`: every change is instant; nothing pulses or breathes.
+
+---
+
+## 13. Presenter Affordances
+
+Hidden keyboard shortcuts for rehearsal and the live demo: `R` reset to the first-load state (Lancome un-imported), `1` / `2` switch modes, `S` toggle Sig only. No visible UI.
+
+---
+
+## 14. Implementation Constraints
+
+- One self-contained `index.html` (inline CSS and JS, hand-drawn SVG, no chart library), plus data files as classic scripts on `window.AFFINITY_DATA`. Opens by double-click from `file://` on a Windows ThinkPad, offline. Shipped as a zip.
+- Fonts are OFL and embedded as data URIs (`scripts/fetch-fonts.mjs`, `scripts/embed-fonts.mjs`); no runtime CDN.
+- Mock data comes from `scripts/generate-data.mjs` (seeded and reproducible). The three named formulas keep the approved v1 AI readings.
+- UI copy in English.
+
+---
+
+## 15. Open Items [TBD]
+
+- Real significance thresholds per attribute.
+- Sage / clay red checked on the Windows projector.
+- Verdict phrasing.
+- Model card contents and version.
+- Real IDs and data for the remaining ~30 history formulas.
+- Whether placeholders stay selectable or become list-only.
+- Whether *Export readings* should be `.xlsx` rather than `.csv`.
+
+---
+
+## 16. Amendments from the build (user-approved, 2026-10-22)
+
+Directed by the user after seeing the build. Each amendment supersedes the matching line above; the lines above are kept as written.
+
+- **§8.1 Lines.** Lines are straight polylines between readings, not monotone curves. The baseline series (bench / baseline time) is a lighter dashed line, `#8E85A2`, 1.5px, dash 5 4, with hollow markers; it no longer uses ink. Markers are small (baseline r 3.3, compared series r 3.7, 2.2px line); significance halos are small (r 11).
+- **§8.2 / §8.4 Continuity.** Lines run continuously from T0 through T3 to T6; they do not break between blocks. (This round also ran the white corridor continuously; the third round removes the corridor.) The blocks stay separated by a rule, a gap and the band numerals only.
+- **§8.1 Attribute labels.** Set lighter: ink 2, weight 400.
+- **§10 Formula record.** Removed. The Dynamic chart uses the full column height, like Comparison. *Readings .csv* sits in the chart toolbar and is shown in Dynamic only.
+- **§2 Proportions.** Chart and findings are about 1.42 : 1, not equal. Column gaps are wider: library 348px, with 44px before its hairline and 52px after; chart / findings 48px before the hairline and 52px after.
+- **§9.1 Verdict.** Set smaller and read as a caption to the chart, not a headline (22px in this round; 21px / 1.45 after the second round below).
+- **§7.5 Empty findings.** Show only the quiet prompt.
+- **§14 Mock data.** The Lancome and YSL mock readings were retuned in `scripts/generate-data.mjs` so a comparison shows a handful of significant differences: Lancome vs NARS is 4 better · 1 worse · 19 on par. NARS keeps the v1 readings.
+- **§6 / §15 Import and export.** The drop zone reads *.xlsx / .csv*; the template download and the readings export are `.csv`; placeholder formulas can be selected.
+
+**Second round (user-approved, 2026-10-22).**
+
+- **§8.1 Polarity arrows.** Removed from beside the attribute labels; the labels start at the label column. The plot spans x 30 to the width less 214px. Better / worse is still spelled out in tooltips and lists, and the library-strip tooltip says *Higher is better* / *Lower is better*.
+- **§3.4 Band numerals.** Moved from the left margin to the lower-right corner of each block, inside the plot, baseline 12px above the block's bottom (58px at 6px inside the plot edge in this round; size, inset and key placement superseded by the third round).
+- **§9 Findings, calmer.** Verdict 21px / 1.45. Tally numerals Bodoni 24px, tally words 14px, tally IDs 15px in ink 2. Better / Worse heads Bodoni 18px with an 18px halo swatch. List attributes 14px caps in ink 2, time 14px, signed difference 15px / 500; list rows at least 31px tall.
+
+**Third round (user-approved, 2026-10-22).**
+
+- **§8.4 / §3.4 / §8.6 Corridor removed.** No white band, no feather filter, no unroll. Significance is shown only by the halos; the tooltip still states the threshold (*beyond / within the ±x threshold*). The first-comparison moment is now: lines draw down, halos bloom, verdict and tally arrive.
+- **§8.5 Key.** Two items only, *Better* and *Worse* (halo swatch, Red Hat Text 15px in ink 2), on one line. In Comparison it sits on the T6 band numeral's baseline, 22px to its left; in Dynamic, which has no numerals, at the plot's lower-right. The *Within threshold* swatch and the reading-rule sentence are gone.
+- **§3.4 Band numerals.** Libre Bodoni 66px, ink at .13, right-aligned 18px inside the plot's right edge, baseline 12px above the block's bottom.
+- **Tokens.** The `corridor` colour is renamed `white` (`#FFFFFF`), used only by the bench pill and the baseline time toggle.
+- **Tooltip.** The on-par icon is a small ink-2 ring (r 3.4, 1.2px stroke).
+- **§9 Findings.** Verdict, tally and lists sit at the top of the column as one group (no vertical centring: it left large empty gaps). The library strips follow 28px below and absorb the remaining height: their row pitch stretches from 24px up to 46px. The verdict has no minimum height; the tally starts 24px below it.
+
+---
+
+## Design tokens (recorded from the build)
+
+The sections below record the shipped `index2.html` as the token layer of this spec, in the canonical DESIGN.md order. They describe; §1–§16 decide. The machine-readable form would normally open the file as YAML frontmatter; it is kept here instead so the authored spec above stays untouched, and is mirrored in `.impeccable/design.json`.
+
+```yaml
+name: Foundation Affinity × AI-lization
+description: A toolbox for pulling and comparing AI sensory readings of foundation.
+colors:
+  paper: "#F5F3F7"
+  surface: "#FCFBFD"
+  white: "#FFFFFF"
+  edge: "#E6E3EB"
+  hair: "#DCD9E0"
+  ink: "#2A2537"
+  ink-2: "#6B5E82"
+  series-a-violet: "#625492"
+  series-b-slate: "#61829E"
+  bench-line: "#8E85A2"
+  better-sage: "#74936C"
+  worse-clay: "#B15D59"
+  a-wash: "rgba(98,84,146,.10)"
+  b-wash: "rgba(97,130,158,.12)"
+  tint: "rgba(42,37,55,.045)"
+  glass: "rgba(47,41,61,.035)"
+typography:
+  display:   { fontFamily: "Libre Bodoni, Georgia, serif", fontSize: "35px", fontWeight: 400, lineHeight: 1, letterSpacing: "0" }
+  sentence:  { fontFamily: "Libre Bodoni, Georgia, serif", fontSize: "32px", fontWeight: 400, lineHeight: 1, letterSpacing: "0" }
+  headline:  { fontFamily: "Libre Bodoni, Georgia, serif", fontSize: "27px", fontWeight: 400, lineHeight: 1, letterSpacing: "0" }
+  verdict:   { fontFamily: "Libre Bodoni, Georgia, serif", fontSize: "21px", fontWeight: 400, lineHeight: 1.45, letterSpacing: "0" }
+  title:     { fontFamily: "Libre Bodoni, Georgia, serif", fontSize: "21px", fontWeight: 400, lineHeight: 1.15, letterSpacing: "0" }
+  numeral:   { fontFamily: "Libre Bodoni, Georgia, serif", fontSize: "30px", fontWeight: 400, lineHeight: 1, letterSpacing: "0", fontFeature: "lnum, pnum" }
+  tally-numeral: { fontFamily: "Libre Bodoni, Georgia, serif", fontSize: "24px", fontWeight: 400, lineHeight: 1, letterSpacing: "0", fontFeature: "lnum, pnum" }
+  findings-head: { fontFamily: "Libre Bodoni, Georgia, serif", fontSize: "18px", fontWeight: 400, lineHeight: 1, letterSpacing: "0" }
+  band-numeral: { fontFamily: "Libre Bodoni, Georgia, serif", fontSize: "66px", fontWeight: 400, lineHeight: 1, letterSpacing: "0" }
+  body:      { fontFamily: "Red Hat Text, Segoe UI, system-ui, sans-serif", fontSize: "16px", fontWeight: 400, lineHeight: 1.3, fontFeature: "lnum, tnum" }
+  id:        { fontFamily: "Red Hat Text, Segoe UI, system-ui, sans-serif", fontSize: "17px", fontWeight: 500, lineHeight: 1, fontFeature: "lnum, tnum" }
+  subtitle:  { fontFamily: "Red Hat Text, Segoe UI, system-ui, sans-serif", fontSize: "18px", fontWeight: 300, lineHeight: 1, letterSpacing: "0.01em" }
+  caption:   { fontFamily: "Red Hat Text, Segoe UI, system-ui, sans-serif", fontSize: "15px", fontWeight: 400, lineHeight: 1.5, fontFeature: "lnum, tnum" }
+  attribute: { fontFamily: "Red Hat Text, Segoe UI, system-ui, sans-serif", fontSize: "15.5px", fontWeight: 400, letterSpacing: "0.9px" }
+  label-caps: { fontFamily: "Red Hat Text, Segoe UI, system-ui, sans-serif", fontSize: "16px", fontWeight: 500, letterSpacing: "0.075em" }
+  list-attribute: { fontFamily: "Red Hat Text, Segoe UI, system-ui, sans-serif", fontSize: "14px", fontWeight: 400, lineHeight: 1.25, letterSpacing: "0.04em" }
+rounded:
+  capsule: "999px"
+  menu: "14px"
+  glass: "12px"
+  hint: "10px"
+  row: "8px"
+  item: "7px"
+  sm: "6px"
+spacing:
+  s1: "4px"
+  s2: "8px"
+  s3: "12px"
+  s4: "16px"
+  s5: "24px"
+  s6: "32px"
+  s7: "40px"
+  s8: "56px"
+components:
+  pill-bench:    { backgroundColor: "{colors.white}", textColor: "{colors.ink}", typography: "{typography.id}", rounded: "{rounded.capsule}", height: "48px", padding: "0 14px 0 16px" }
+  pill-series-a: { backgroundColor: "{colors.a-wash}", textColor: "{colors.ink}", typography: "{typography.id}", rounded: "{rounded.capsule}", height: "48px", padding: "0 14px 0 16px" }
+  pill-series-b: { backgroundColor: "{colors.b-wash}", textColor: "{colors.ink}", typography: "{typography.id}", rounded: "{rounded.capsule}", height: "48px", padding: "0 14px 0 16px" }
+  pill-empty:    { textColor: "{colors.ink-2}", typography: "{typography.body}", rounded: "{rounded.capsule}", height: "48px", padding: "0 14px 0 16px" }
+  time-toggle:   { textColor: "{colors.ink-2}", rounded: "{rounded.capsule}", height: "48px", padding: "0 20px" }
+  mode-switch:   { backgroundColor: "{colors.tint}", textColor: "{colors.ink-2}", rounded: "{rounded.capsule}", padding: "4px", width: "300px" }
+  mode-switch-thumb: { backgroundColor: "{colors.surface}", textColor: "{colors.ink}", rounded: "{rounded.capsule}", width: "150px", height: "42px" }
+  tool:          { textColor: "{colors.ink-2}", typography: "{typography.caption}", rounded: "{rounded.capsule}", height: "36px", padding: "0 12px" }
+  tool-hover:    { backgroundColor: "{colors.tint}", textColor: "{colors.ink}" }
+  library-row:   { textColor: "{colors.ink}", typography: "{typography.body}", rounded: "{rounded.row}", height: "38px", padding: "7px 10px" }
+  library-row-new: { backgroundColor: "{colors.a-wash}", textColor: "{colors.ink}", rounded: "{rounded.row}" }
+  drop-zone:     { textColor: "{colors.ink}", rounded: "{rounded.glass}", padding: "18px 20px 16px" }
+  menu:          { backgroundColor: "{colors.surface}", rounded: "{rounded.menu}", width: "380px", padding: "10px 8px 8px" }
+  vellum-tooltip: { backgroundColor: "{colors.glass}", textColor: "{colors.ink}", rounded: "{rounded.glass}", padding: "14px 18px 15px" }
+  search-field:  { textColor: "{colors.ink}", height: "46px", padding: "0 2px" }
+```
+
+## Colors
+
+Lilac paper and ink, one brand violet, one cool slate, and a Morandi verdict pair that appears only as halos. Values are the `:root` custom properties and the chart constants `C` / `ROLE`.
+
+### Primary
+- **Brand Violet** (`series-a-violet`): series A's line, filled markers, pill wash and glyph; the Sig-only switch when on; focus outlines, caret and selection; the drop zone's dashed edge and arrow; the *Uploaded* wash and *New* tag. The page's identity.
+
+### Secondary
+- **Weathered Slate** (`series-b-slate`): series B only — line, markers, pill wash. Never decorative.
+
+### Tertiary
+- **Morandi Sage** (`better-sage`) and **Clay Red** (`worse-clay`): the verdict pair. Carried by halos (radial gradient, stops .72 / .42 / 0, with a .5-opacity ring), the list-head dots and the verdict underlines (sage at .75, clay at .7). Always spelled out in words beside them.
+
+### Neutral
+- **Lilac Paper** (`paper`): page ground; also the veil colour for Sig only.
+- **Vellum White** (`surface`): standing surfaces — menus, pills, the mode-switch thumb, toggle knobs.
+- **White** (`white`): the bench pill and the baseline time toggle only. (Formerly `corridor`; the corridor is removed, §16.)
+- **Edge** (`edge`) and **Hair** (`hair`): 1px structure. Hair draws the column hairlines, group and section rules, chart verticals; edge outlines standing surfaces.
+- **Ink** (`ink`): text, the ruler, band numerals at .13 opacity (lower-right of each block), library strip dots at .22.
+- **Ink 2** (`ink-2`): secondary text, attribute labels (chart and findings lists), tally IDs, captions, placeholder rows.
+- **Bench Grey-Violet** (`bench-line`): the baseline series line and hollow markers only (§16).
+- **Washes**: `a-wash` and `b-wash` tint series pills and new rows; `tint` (ink at 4.5%) is the one hover / pressed-ground colour; row highlight bands use violet at 7.5%.
+
+### Named Rules
+**The Halo Carries the Verdict Rule.** Sage and clay red never colour a line, a pill or text; they appear only as halos, the list-head dots and the verdict underline. The line keeps its series colour.
+
+**The Uncoloured Baseline Rule.** The baseline is grey-violet, dashed and hollow; it never takes a series colour or the verdict pair.
+
+## Typography
+
+**Display Font:** Libre Bodoni 400, upright and italic (with Georgia, Times New Roman)
+**Body Font:** Red Hat Text 300–500 (with Segoe UI, system-ui)
+
+**Character:** A Didone that sets the page's voice — title, connective words, verdict, numerals — against a quiet humanist sans that carries every code, figure and control in tabular lining figures. Both are embedded as data URIs; Bodoni ships an italic, Red Hat Text a variable 300–500 axis.
+
+### Hierarchy
+- **Display** (Bodoni 400, 35px, line-height 1): the title only.
+- **Sentence** (Bodoni italic 400, 32px; 29px when the sentence tightens): the connective words *Compare / and / against / Track / over*.
+- **Headline** (Bodoni 400, 27px): *Library*; section heads at 22px (*Where they sit in the library*), 21px (drop-zone title), 20px (mode labels), 19px (Uploaded / History groups), 18px (Better / Worse).
+- **Verdict** (Bodoni 400, 21px, line-height 1.45; prompt in italic 21px, ink 2): a caption to the chart (§16).
+- **Numerals** (Bodoni 400, lining proportional): upload counter 30px, tally 24px, model-card figure 46px, ruler integers 19px, band numerals T0 / T3 / T6 66px at .13 opacity, right-aligned in each block's lower-right corner.
+- **Body** (Red Hat Text 400, 16px, line-height 1.3, tabular): formula IDs in library rows; tooltips at 15.5px; tally IDs at 15px in ink 2.
+- **ID in a pill** (Red Hat Text 500, 17px).
+- **Subtitle** (Red Hat Text 300, 18px, ink 2, +0.01em).
+- **Caption** (Red Hat Text 400, 15px, ink 2): chart caption, tool labels, counts, *+n more*, model-card text (line-height 1.5); tally words at 14px.
+- **Attribute** (Red Hat Text 400, uppercase, 15.5px with 0.9px tracking in Comparison, 17px with 1.1px in Dynamic, ink 2): chart labels; 16px with 0.6px in the library strips; findings list items 14px with 0.04em, time 14px, signed difference 15px / 500 in ink.
+
+### Named Rules
+**The Untracked Didone Rule.** Libre Bodoni is always `letter-spacing: 0`, with common and contextual ligatures on and proportional numerals.
+
+**The Tabular Sans Rule.** Red Hat Text always runs lining tabular figures, so columns of readings align without a table.
+
+## Layout
+
+One fixed 1920 × 1050 stage scaled to fit by a transform, never reflowed; padding 30px top, 56px sides, 34px bottom. Rows: a 64px top bar, a 22px gap, then the work area. The work area is a 348px library and the main column; the library keeps 44px before its full-height hairline and the main column starts 52px after it. The main column stacks an 84px sentence band (hairline beneath, 20px gap) over the content grid, chart : findings at 1.42fr : 1fr, with 48px before the hairline and 52px after. The library list is the only scrolling region; its bottom 36px fades out through a mask.
+
+Spacing runs on a 4px base (`s1`–`s8`: 4, 8, 12, 16, 24, 32, 40, 56). Larger column gutters (44 / 48 / 52) are deliberate breathing room on the 13" target, where the canvas renders near 0.7×.
+
+Chart geometry: a 54px top band for the ruler, 24px gaps between Comparison's three blocks, plot from x 30 to the width less 214px, with the label column 24px past the plot's right edge. Band numerals sit inside the plot at each block's lower-right corner. Comparison has 24 rows, Dynamic 8 rows at roughly three times the height; both fill the column.
+
+## Elevation & Depth
+
+Flat paper with two depth materials. Standing surfaces are opaque with a 1px edge and, where they lift, a short ambient drop; things that follow the pointer and leave are smoked-vellum glass. The plot itself is flat: halos are the only soft light in it.
+
+### Shadow Vocabulary
+- **Lift** (`box-shadow: 0 8px 22px rgba(42,37,55,.10), 0 1px 2px rgba(42,37,55,.06)`): the mode-switch thumb.
+- **Menu** (`box-shadow: 0 10px 22px rgba(42,37,55,.12), 0 1px 3px rgba(42,37,55,.06)`): floating dropdown menus, with the 1px edge.
+- **Vellum drop** (`box-shadow: 0 10px 28px rgba(42,37,55,.13), 0 1px 2px rgba(42,37,55,.06), inset 0 1px 0 rgba(255,255,255,.65)`; `backdrop-filter: blur(14px) saturate(1.2) brightness(1.07)` over `rgba(47,41,61,.035)`): tooltips, model card, hints, toast. The inset line is the cut edge.
+- **Bench rest** (`box-shadow: 0 1px 0 rgba(42,37,55,.04)`): the bench pill's hairline footing.
+- **Knob** (`box-shadow: 0 1px 2px rgba(42,37,55,.25)`): the Sig-only switch knob.
+
+### Named Rules
+**The Glass Is Temporary Rule.** Vellum only on what appears under the pointer and leaves; anything that stands on the page is opaque.
+
+## Shapes
+
+Capsules for everything you press or choose (pills, mode switch, tools, time toggles, mini segment, tags: 999px). Soft rectangles for floating and hover grounds: menus 14px, vellum and the drop zone 12px, hints 10px, library rows 8px, findings items 7px, strip highlight bands and focus rings 6px. Dashed 1px borders mean "empty, fill me" (empty pills, off time toggles, the drop zone, the page drag frame at 18px). Chart marks are circles; arrows, chevrons, swap and close marks are drawn SVG strokes (1.1–1.4px, round caps), never typed glyphs.
+
+## Components
+
+### Pills (the sentence slots)
+- **Shape:** capsule, 48px tall, 1px border.
+- **Bench:** white with an ink border and an italic Bodoni *Bench* caption behind a hairline; no remove button.
+- **Series A / B:** surface with the series wash; border in the series colour at .42 / .48.
+- **Empty:** transparent, dashed ink at .32, ink-2 label; hover turns the border to ink. When it is what blocks the chart it breathes (1.5s each way, alternating, on the one curve; a 7px violet ring at .09).
+- **Tools:** 30px circular swap / remove buttons, ink 2, ink-at-7% hover.
+- **Fill:** ink-drop — a circle floods from the glyph outward over .9s, then fades.
+
+### Time toggles (Dynamic)
+- Capsule, 48px, Red Hat Text 500 18px. Off: dashed, ink 2. On: solid, taking bench / series styling in order of time.
+
+### Mode switch
+- A 4px-padded capsule on the ink tint with two 150px Bodoni 20px buttons; the thumb is surface with edge and Lift and glides .5s on the house curve.
+
+### Tools (chart toolbar)
+- Ghost capsule buttons, 36px, caption type with a 16px drawn icon; hover fills with tint and inks the text. Sig only carries a 34 × 20px switch that turns violet when on. *Readings .csv* appears only in Dynamic (§16).
+
+### Search field
+- Underline only: a 46px row with a hair rule that turns ink on focus; a drawn magnifier in ink 2; light 300 placeholder.
+
+### Drop zone
+- Dashed violet at .45, 12px radius, Bodoni 21px title with a drawn arrow, caption *.xlsx / .csv*. Hover and page drag fill it with the violet wash. While importing, the filename, a rolling Bodoni counter and a 2px violet progress rule replace the idle copy.
+
+### Library rows
+- 38px min, 8px radius, tint on hover or link highlight. Placeholder rows in ink 2 weight 300. Uploaded rows carry the violet wash and flash on arrival.
+
+### Menus
+- 380px surface panel, 14px radius, edge plus Menu shadow, opening with a .2s fade and slight scale from the top left; same search and groups as the library.
+
+### Vellum tooltip
+- 12px glass plate, 14px 18px padding; content typeset in a grid (glyph, who, value, difference) with a hair rule above the Bodoni verdict line: a halo swatch for Better / Worse, a small ink-2 ring for On par, and the threshold in words. Fades in .18s; leaves the same way.
+
+### Chart (signature)
+- Ruler: ink baseline at .55, integer ticks at .7 and minor ticks at .38, Bodoni integers 19px. Verticals in hair. Band numerals T0 / T3 / T6 at 66px, .13, right-aligned 18px inside the plot's right edge with the baseline 12px above the block's bottom.
+- No corridor (§16): significance is read from the halos alone; thresholds are stated in the tooltip.
+- Series: straight polylines; baseline `bench-line` 1.5px dashed 5 4 with hollow r 3.3 markers; compared series 2.2px with filled r 3.7 markers. Lifted markers grow 1.6×, halos (r 11) 1.25×.
+- Labels: the uppercase attribute name in ink 2, weight 400, starting at the label column; no polarity arrow (§16). Polarity is spelled out in tooltips, lists and the strip tooltip (*Higher / Lower is better*).
+- Hover: a violet 7.5% row band, the counterpart linked by a dashed ink connector (2 3).
+- Key: *Better* and *Worse* on one line, each an 8.5px-radius halo swatch with an ink dot and Red Hat Text 15px in ink 2, 20px apart; on the T6 numeral's baseline 22px to its left, or at the plot's lower-right in Dynamic. No backing plate.
+
+### Findings
+- Verdict, tally and lists form one top-aligned group (verdict without a minimum height; tally 24px below it); the strips sit 28px below and stretch their row pitch (24–46px) to fill the column. Verdict caption, then a tally row per series (48px min; glyph, ID 15px in ink 2, Bodoni 24px numerals with 14px words), Better / Worse lists side by side (Bodoni 18px heads with an 18px halo swatch; 22px glyph column, 31px items, 14px caps attribute in ink 2, signed difference 15px / 500), and the library strips: faint ink dots per formula, a dashed ink ring for the bench, series dots in colour.
+
+### Motion
+One curve, `cubic-bezier(.16,1,.3,1)` (JS uses the matching exponential ease-out). Durations: fast .16s (hover grounds), state .3s (borders, toggles, veils), flow .65s (lines moving to new values), thumb .5s, vellum .18s, menus .2s, arrival .7s staggered .06 / .14 / .22 / .30s, line draw 1.0s (1.3s on the first comparison). `prefers-reduced-motion` makes every change instant.
+
+## Do's and Don'ts
+
+### Do:
+- **Do** keep every new colour inside the palette above; washes are the series colours at 10–12% and hover grounds are ink at 4.5%.
+- **Do** draw arrows, chevrons and marks as SVG strokes; both families ship Latin only.
+- **Do** use capsules for anything pressed or chosen and dashed borders for anything empty.
+- **Do** move with the one curve and the fast / state / flow durations.
+- **Do** give halos, not lines, the verdict colours, and spell *Better* / *Worse* out beside them.
+
+### Don't:
+- **Don't** track Libre Bodoni or set it in a weight other than 400.
+- **Don't** put a card behind a region; structure comes from hairlines, surface contrast and space.
+- **Don't** use vellum glass for anything that stays on the page, or an opaque surface for anything that follows the pointer.
+- **Don't** set text in uppercase except the eight attribute names.
+- **Don't** break the lines between time blocks (§16).

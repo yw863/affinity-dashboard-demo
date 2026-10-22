@@ -1,11 +1,19 @@
-// Mock data generator for Affinity × AI demo.
+// Mock data generator for Foundation Affinity × AI-lization (DESIGN v2).
 // Usage: node scripts/generate-data.mjs
-// Writes data-core.js + one data-<id>.js per formula into the project root,
-// then re-loads those files from disk and prints the verification report.
 //
-// Output format: classic scripts attaching to window.AFFINITY_DATA
-// (works when index.html is opened via file://, unlike ES modules).
-// Load order in index.html: data-core.js first, then each data-<id>.js.
+// Writes classic scripts that attach to window.AFFINITY_DATA (works from file://):
+//   data-core.js            dimensions, sig thresholds, polarity, model badge copy
+//   data-nars-lightr.js     b53176_NARS #L2              (history)
+//   data-ysl-all-hours.js   993472_YSL all hours LC1     (history)
+//   data-lancome-tiu.js     Lancome TIU #PO_01_Anker 4.15 (pending → revealed by the fake upload)
+//   data-placeholders.js    Product 0001 … Product 0020  (history, generated)
+// Load order in index.html: data-core.js first, then the rest.
+//
+// NARS keeps the AI readings approved in v1. Lancome and YSL were retuned on
+// 2026-10-22 at the user's request so a comparison shows a handful of significant
+// differences rather than most of them (Lancome vs NARS: 4 better, 1 worse; the
+// story stays "covers more by T3, turns more powdery by T6"). v2 drops the panel
+// values: the AI readings stand on their own. Only the placeholders are generated here.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -19,43 +27,47 @@ const ATTRIBUTES = [
   "CAKEY", "FLAKE", "IMBED INTO LINES", "CLOG INTO PORES",
 ];
 const TIMES = ["T0", "T3", "T6"];
-const TOLERANCE = 0.5;
+// Sig threshold per attribute — MOCK until the sensory team supplies the real ones.
+const THRESHOLDS = [0.5, 0.4, 0.4, 0.3, 0.3, 0.3, 0.3, 0.3];
+// +1: higher is better (COVERAGE, REFLECTION vs. BARE); -1: lower is better.
+const POLARITY = [1, 1, -1, -1, -1, -1, -1, -1];
+const MODEL = { name: "DINOv2", acceptance: 83.4, tolerance: 0.5 };   // badge copy, mock
 
-// ---- Panel ground truth ---------------------------------------------------
-// T0 baselines. LANCOME TIU follows the shape of the real panel chart
-// (coverage ~4, everything else clustered ~0.5–1.3).
-const FORMULAS = [
-  { id: "nars-lightr",   name: "NARS LightR",   ours: false, wear: 1.0,
-    t0: [3.3, 1.5, 1.4, 0.9, 0.8, 0.7, 0.5, 0.6] },   // light, radiant
-  { id: "lancome-tiu",   name: "LANCOME TIU",   ours: true,  wear: 1.0,
-    t0: [4.0, 1.0, 1.2, 1.3, 1.1, 0.9, 0.5, 0.7] },   // from real chart
-  { id: "ysl-all-hours", name: "YSL All Hours", ours: true,  wear: 1.4,
-    t0: [4.5, 0.8, 1.0, 1.6, 1.4, 1.2, 0.9, 1.0] },   // full-cover matte
+// ---- Named formulas: approved v1 AI readings, unchanged ---------------------
+const NAMED = [
+  { file: "data-nars-lightr.js", id: "b53176_NARS #L2", group: "history",
+    source: { file: "b53176_NARS_L2_AI-readings.xlsx", imported: "2026-08-14", images: 45 },
+    scores: {
+      T0: [3.1, 0.9, 1.4, 0.5, 0.7, 0.6, 0.7, 0.4],
+      T3: [2.6, 1.0, 1.1, 0.4, 1.0, 1.1, 0.9, 0.7],
+      T6: [2.9, 1.2, 1.2, 0.4, 0.8, 1.1, 0.7, 0.7] } },
+  { file: "data-ysl-all-hours.js", id: "993472_YSL all hours LC1", group: "history",
+    source: { file: "993472_YSL_all_hours_LC1_AI-readings.xlsx", imported: "2026-09-02", images: 45 },
+    scores: {
+      T0: [3.5, 0.9, 1.5, 0.8, 0.8, 0.7, 1.0, 0.6],
+      T3: [3.0, 0.8, 1.2, 0.7, 1.1, 1.0, 1.0, 0.4],
+      T6: [2.6, 1.1, 1.6, 0.8, 0.9, 1.0, 0.9, 1.1] } },
+  { file: "data-lancome-tiu.js", id: "Lancome TIU #PO_01_Anker 4.15", group: "pending",
+    source: { file: null, imported: null, images: 45 },   // filled in by the upload
+    scores: {
+      T0: [3.7, 1.1, 1.3, 0.7, 0.8, 0.8, 0.8, 0.5],
+      T3: [3.7, 1.2, 1.0, 0.6, 1.0, 1.0, 0.4, 0.6],
+      T6: [3.2, 1.6, 1.3, 1.4, 1.0, 1.0, 0.8, 0.6] } },
 ];
 
-// Cells the user adjusted by hand after reviewing the output, kept here so a re-run
-// reproduces the approved data instead of silently reverting them. Applied after the
-// draw, so they never shift the seed search. Indices are [time][attribute].
-const OVERRIDES = {
-  "lancome-tiu": { T0: { 0: { panel: 4.3, ai: 4.1 } } },   // COVERAGE
-};
-
-// Wear drift from T0, [T3, T6], scaled by formula.wear.
-// Coverage fades; shine breaks through; texture defects accumulate.
+// ---- Placeholders ------------------------------------------------------------
+const SEED = 2026;
+const N_PLACEHOLDERS = 20;
+// Population centre and spread at T0, per attribute (around the named formulas).
+const CENTRE = [3.7, 1.1, 1.3, 1.3, 1.1, 1.0, 0.9, 0.8];
+const SPREAD = [0.55, 0.35, 0.3, 0.5, 0.3, 0.3, 0.3, 0.3];
+// Wear drift from T0 [T3, T6]: coverage fades, shine breaks through, texture defects build.
 const DRIFT = [
-  [-0.10, -0.25], [0.05, 0.15], [0.05, 0.15], [0.10, 0.30],
-  [0.10, 0.30],   [0.05, 0.20], [0.10, 0.30], [0.10, 0.25],
+  [-0.35, -0.6], [0.1, 0.3], [0.05, 0.2], [0.1, 0.35],
+  [0.1, 0.35],   [0.1, 0.3], [0.1, 0.3],  [0.1, 0.35],
 ];
+const NOISE = 0.12;
 
-// ---- AI error model -------------------------------------------------------
-// error = per (formula, attribute) bias  +  per-time jitter.
-// The shared bias keeps T0/T3/T6 AI curves similar, like a real model would.
-// REFLECTION vs. BARE (index 1) is intentionally noisier.
-const SIGMA_BIAS = [0.25, 0.32, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25];
-const SIGMA_TIME = [0.20, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20, 0.20];
-const PANEL_JITTER = 0.05;
-
-// ---- Seeded RNG -----------------------------------------------------------
 function mulberry32(seed) {
   return function () {
     seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
@@ -69,152 +81,88 @@ const gauss = (rng) => {
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 };
 const r1 = (x) => Math.round(Math.min(6, Math.max(0, x)) * 10) / 10;
-// Compare in tenths to avoid float noise (0.5 must count as accepted).
-const diffTenths = (c) => Math.abs(Math.round(c.ai * 10) - Math.round(c.panel * 10));
-const accepted = (c) => diffTenths(c) <= TOLERANCE * 10;
 
-function generate(seed) {
-  const rng = mulberry32(seed);
-  return FORMULAS.map((f) => {
-    const bias = ATTRIBUTES.map((_, a) => gauss(rng) * SIGMA_BIAS[a]);
-    const scores = {};
-    TIMES.forEach((t, ti) => {
-      scores[t] = ATTRIBUTES.map((_, a) => {
-        const drift = ti === 0 ? 0 : DRIFT[a][ti - 1] * f.wear;
-        const panel = r1(f.t0[a] + drift + gauss(rng) * PANEL_JITTER);
-        const ai = r1(panel + bias[a] + gauss(rng) * SIGMA_TIME[a]);
-        return { panel, ai };
-      });
-    });
-    const over = OVERRIDES[f.id];
-    if (over) {
-      for (const t of Object.keys(over)) {
-        for (const a of Object.keys(over[t])) scores[t][a] = { ...over[t][a] };
-      }
-    }
-    return { id: f.id, name: f.name, ours: f.ours, scores };
+const rng = mulberry32(SEED);
+const placeholders = [];
+for (let k = 1; k <= N_PLACEHOLDERS; k++) {
+  const wear = 0.6 + rng() * 1.0;
+  const t0 = CENTRE.map((c, a) => c + gauss(rng) * SPREAD[a]);
+  const scores = {};
+  TIMES.forEach((t, ti) => {
+    scores[t] = t0.map((v, a) => r1(v + (ti ? DRIFT[a][ti - 1] * wear : 0) + gauss(rng) * NOISE));
+  });
+  const id = "Product " + String(k).padStart(4, "0");
+  const month = 1 + Math.floor(rng() * 8), day = 1 + Math.floor(rng() * 27);
+  placeholders.push({
+    id, group: "history", placeholder: true,
+    source: { file: id.replace(" ", "_") + "_AI-readings.xlsx",
+              imported: `2026-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+              images: 45 },
+    scores,
   });
 }
 
-// ---- Metrics (same definitions the front end will use, DESIGN §4.3) ------
-function metrics(formulas) {
-  const cells = [];
-  formulas.forEach((f) => TIMES.forEach((t) =>
-    f.scores[t].forEach((c, a) => cells.push({ f, t, a, c }))));
-  const acc = (xs) => xs.filter((x) => accepted(x.c)).length / xs.length;
-  return {
-    global: { acc: acc(cells), hit: cells.filter((x) => accepted(x.c)).length, n: cells.length },
-    perAttr: ATTRIBUTES.map((_, a) => {
-      const xs = cells.filter((x) => x.a === a);
-      return { acc: acc(xs), hit: xs.filter((x) => accepted(x.c)).length, n: xs.length };
-    }),
-    perFormula: formulas.map((f) => {
-      const xs = cells.filter((x) => x.f === f);
-      const mae = Object.fromEntries(TIMES.map((t) =>
-        [t, f.scores[t].reduce((s, c) => s + diffTenths(c) / 10, 0) / 8]));
-      return { f, acc: acc(xs), hit: xs.filter((x) => accepted(x.c)).length, n: xs.length, mae };
-    }),
-    maxErr: Math.max(...cells.map((x) => diffTenths(x.c) / 10)),
-  };
-}
-
-const WEAR = [3, 4, 5, 6, 7]; // POWDERY … CLOG
-const mean = (xs) => xs.reduce((s, x) => s + x, 0) / xs.length;
-
-function storyHolds(formulas) {
-  const m = metrics(formulas);
-  if (m.global.acc < 0.83 || m.global.acc > 0.85) return false;
-  // REFLECTION strictly the least accurate attribute, but only "a little"
-  // noisier (5–6 of 9); others 7–9 of 9, and not a wall of perfect scores.
-  const refl = m.perAttr[1];
-  if (refl.hit < 5 || refl.hit > 6) return false;
-  if (!m.perAttr.every((p, a) => a === 1 || p.hit >= 7)) return false;
-  if (m.perAttr.filter((p) => p.hit === 9).length > 3) return false;
-  if (m.maxErr > 0.8) return false;
-  // Showcase formulas all look good; default view (NARS T0) strong.
-  if (!m.perFormula.every((p) => p.acc >= 0.79 && Object.values(p.mae).every((v) => v <= 0.4))) return false;
-  // Default view (NARS LightR, T0) is the best-looking formula.
-  if (!m.perFormula.slice(1).every((p) => m.perFormula[0].acc > p.acc)) return false;
-  if (formulas[0].scores.T0.filter(accepted).length < 7) return false;
-  if (!formulas[0].scores.T0.every((c) => diffTenths(c) <= 6)) return false;
-  for (const f of formulas) {
-    // Physics: wear attributes rise T0→T6 (panel), coverage falls.
-    if (!WEAR.every((a) => f.scores.T6[a].panel > f.scores.T0[a].panel)) return false;
-    if (!(f.scores.T6[0].panel < f.scores.T0[0].panel)) return false;
-  }
-  // NOTE: an earlier version also required every `ours` formula to out-wear the
-  // market ones at T6. That constraint is gone on purpose. `ours` is a presentation
-  // label the user sets by hand, not a property of the simulated physics: YSL is
-  // deliberately the worst-wearing formula here (full-cover matte, wear 1.4), so a
-  // rule tying the label to the wear ranking made the two contradict each other and
-  // pushed the seed search off the approved data. Wear behaviour is constrained
-  // above, per formula; who owns a formula is not the generator's business.
-  return true;
-}
-
-// ---- Search the first seed where the story holds -------------------------
-let seed = 1;
-let formulas;
-for (; seed < 100000; seed++) {
-  formulas = generate(seed);
-  if (storyHolds(formulas)) break;
-}
-if (seed >= 100000) throw new Error("No seed satisfies the story constraints");
-
-// ---- Write files ----------------------------------------------------------
+// ---- Write -------------------------------------------------------------------
 const header = (what) =>
-  `// ${what}\n// Generated by scripts/generate-data.mjs (seed ${seed}). Do not edit by hand.\n`;
+  `// ${what}\n// Generated by scripts/generate-data.mjs. Do not edit by hand.\n`;
+const fmt = (f, indent) => {
+  const pad = " ".repeat(indent);
+  return `${pad}{\n` +
+    `${pad}  id: ${JSON.stringify(f.id)},\n` +
+    `${pad}  group: ${JSON.stringify(f.group)},\n` +
+    (f.placeholder ? `${pad}  placeholder: true,\n` : "") +
+    `${pad}  source: ${JSON.stringify(f.source)},\n` +
+    `${pad}  scores: {\n` +
+    TIMES.map((t) => `${pad}    ${t}: [${f.scores[t].map((v) => v.toFixed(1)).join(", ")}]`).join(",\n") +
+    `\n${pad}  }\n${pad}}`;
+};
 
 fs.writeFileSync(path.join(ROOT, "data-core.js"),
-  header("Affinity × AI — shared dimensions. Load before any data-<formula>.js.") +
+  header("Affinity × AI — shared dimensions. Load before any other data file.") +
+  `// thresholds and model figures are MOCK until the sensory team supplies real ones.\n` +
   `window.AFFINITY_DATA = {\n` +
   `  attributes: ${JSON.stringify(ATTRIBUTES)},\n` +
   `  times: ${JSON.stringify(TIMES)},\n` +
+  `  thresholds: ${JSON.stringify(THRESHOLDS)},\n` +
+  `  polarity: ${JSON.stringify(POLARITY)},\n` +
+  `  model: ${JSON.stringify(MODEL)},\n` +
   `  formulas: []\n};\n`);
 
-for (const f of formulas) {
-  const body = TIMES.map((t) =>
-    `    ${t}: [\n` +
-    f.scores[t].map((c, a) =>
-      `      { panel: ${c.panel.toFixed(1)}, ai: ${c.ai.toFixed(1)} }, // ${ATTRIBUTES[a]}`).join("\n") +
-    `\n    ]`).join(",\n");
-  fs.writeFileSync(path.join(ROOT, `data-${f.id}.js`),
-    header(`Affinity × AI — ${f.name}`) +
-    `window.AFFINITY_DATA.formulas.push({\n` +
-    `  id: ${JSON.stringify(f.id)},\n  name: ${JSON.stringify(f.name)},\n  ours: ${f.ours},\n` +
-    `  scores: {\n${body}\n  }\n});\n`);
+for (const f of NAMED) {
+  fs.writeFileSync(path.join(ROOT, f.file),
+    header(`Affinity × AI — ${f.id}`) +
+    `// AI readings (0–6). Scores per time are in attribute order.\n` +
+    `window.AFFINITY_DATA.formulas.push(\n${fmt(f, 0)}\n);\n`);
 }
 
-// ---- Verify from the written files (not from memory) ---------------------
+fs.writeFileSync(path.join(ROOT, "data-placeholders.js"),
+  header(`Affinity × AI — ${N_PLACEHOLDERS} placeholder formulas (seed ${SEED})`) +
+  `// Stand-ins for the ~50 history formulas still to come. Labelled as placeholders.\n` +
+  `window.AFFINITY_DATA.formulas.push(\n${placeholders.map((f) => fmt(f, 2)).join(",\n")}\n);\n`);
+
+// ---- Verify from the written files -------------------------------------------
 const ctx = { window: {} };
 vm.createContext(ctx);
-for (const file of ["data-core.js", ...FORMULAS.map((f) => `data-${f.id}.js`)]) {
+for (const file of ["data-core.js", ...NAMED.map((f) => f.file), "data-placeholders.js"]) {
   vm.runInContext(fs.readFileSync(path.join(ROOT, file), "utf8"), ctx, { filename: file });
 }
 const D = ctx.window.AFFINITY_DATA;
-const m = metrics(D.formulas);
-const pct = (x) => (x * 100).toFixed(1) + "%";
-const pad = (s, n) => String(s).padEnd(n);
-
-console.log(`seed ${seed} · tolerance ±${TOLERANCE} · ${D.formulas.length} formulas × ${D.times.length} times × ${D.attributes.length} attributes`);
-console.log(`\nGLOBAL ACCURACY  ${pct(m.global.acc)}  (${m.global.hit}/${m.global.n})   max |Δ| ${m.maxErr.toFixed(1)}`);
-
-console.log(`\nPER ATTRIBUTE`);
-m.perAttr.forEach((p, a) => console.log(`  ${pad(D.attributes[a], 22)} ${pad(pct(p.acc), 7)} (${p.hit}/${p.n})`));
-
-console.log(`\nPER FORMULA                accuracy        MAE T0 / T3 / T6`);
-m.perFormula.forEach((p) => console.log(
-  `  ${pad(p.f.name + (p.f.ours ? " ●" : " ○"), 22)} ${pad(pct(p.acc), 6)} (${p.hit}/${p.n})   ` +
-  TIMES.map((t) => p.mae[t].toFixed(2)).join(" / ")));
-
-console.log(`\nT0 vs T6 MEAN (panel / ai, across formulas)`);
-D.attributes.forEach((name, a) => {
-  const at = (t, k) => mean(D.formulas.map((f) => f.scores[t][a][k]));
-  const d = at("T6", "panel") - at("T0", "panel");
-  console.log(`  ${pad(name, 22)} T0 ${at("T0", "panel").toFixed(2)} / ${at("T0", "ai").toFixed(2)}   ` +
-    `T6 ${at("T6", "panel").toFixed(2)} / ${at("T6", "ai").toFixed(2)}   Δpanel ${d >= 0 ? "+" : ""}${d.toFixed(2)}`);
-});
-
-console.log(`\nAFFINITY (mean panel of POWDERY…CLOG at T6, lower = better)`);
-D.formulas.forEach((f) => console.log(
-  `  ${pad(f.name + (f.ours ? " ●" : " ○"), 22)} ${mean(WEAR.map((a) => f.scores.T6[a].panel)).toFixed(2)}`));
+const byId = (id) => D.formulas.find((f) => f.id === id);
+function sigs(x, base) {
+  const out = { better: 0, worse: 0, par: 0 };
+  for (const t of D.times) x.scores[t].forEach((v, a) => {
+    const d = Math.round(v * 10) - Math.round(base.scores[t][a] * 10);
+    if (Math.abs(d) >= Math.round(D.thresholds[a] * 10)) out[d * D.polarity[a] > 0 ? "better" : "worse"]++;
+    else out.par++;
+  });
+  return out;
+}
+console.log(`${D.formulas.length} formulas (${D.formulas.filter((f) => f.group === "pending").length} pending)`);
+const nars = byId("b53176_NARS #L2");
+for (const f of D.formulas.filter((f) => !f.placeholder && f !== nars)) {
+  const s = sigs(f, nars);
+  console.log(`${f.id.padEnd(32)} vs NARS: ${s.better} better · ${s.worse} worse · ${s.par} on par`);
+}
+const T6 = D.attributes.map((_, a) => D.formulas.map((f) => f.scores.T6[a]));
+console.log("T6 range per attribute:",
+  T6.map((xs, a) => `${D.attributes[a].split(" ")[0]} ${Math.min(...xs)}–${Math.max(...xs)}`).join(" · "));

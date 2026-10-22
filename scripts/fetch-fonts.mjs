@@ -25,6 +25,7 @@ const UA =
 
 const REQUESTS = [
   { slug: "libre-bodoni", query: "family=Libre+Bodoni:wght@400" },
+  { slug: "libre-bodoni-italic", query: "family=Libre+Bodoni:ital,wght@1,400" },
   { slug: "red-hat-text", query: "family=Red+Hat+Text:wght@300..500" },
   { slug: "red-hat-text-italic", query: "family=Red+Hat+Text:ital,wght@1,300..500" },
 ];
